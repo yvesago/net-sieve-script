@@ -2,21 +2,12 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 9;
+use Test::More tests => 8;
 use strict;
 
 use lib qw(lib);
 
 BEGIN { use_ok( 'NET::Sieve::Script' ); }
-
-my $object = NET::Sieve::Script->new (name => "test");
-isa_ok ($object, 'NET::Sieve::Script');
-
-is ($object->name,'test',"name set");
-$object->status('ACTIVE');
-is ($object->status,'ACTIVE',"active status set");
-$object->status('');
-is ($object->status,'',"unactive status set");
 
 my $test_script='require "fileinto";
 # Place all these in the "Test" folder
@@ -24,8 +15,13 @@ if header :contains "Subject" "[Test]" {
        fileinto "Test";
 }';
 
-$object->raw($test_script);
-#print $object->raw;
+my $object = NET::Sieve::Script->new ();
+isa_ok ($object, 'NET::Sieve::Script');
+
+my $object = NET::Sieve::Script->new ($test_script);
+isa_ok ($object, 'NET::Sieve::Script');
+
+
 is ($object->raw, $test_script, "raw script");
 #print length($object->raw);
 
@@ -54,10 +50,13 @@ if header :is "Subject" "Daily virus scan reminder"
 
 $object->raw($test_script2);
 
+is ($object->raw, $test_script2, "set raw script");
+
 use_ok( 'NET::Sieve::Script::Rule' );
 use_ok( 'NET::Sieve::Script::Condition' );
 use_ok( 'NET::Sieve::Script::Action' );
 
+exit;
 
     print $object->name."\n";
     print $object->status."\n";

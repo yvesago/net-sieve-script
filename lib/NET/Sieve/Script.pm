@@ -19,7 +19,7 @@ use NET::Sieve::Script::Rule;
 use NET::Sieve::Script::Condition;
 use NET::Sieve::Script::Action;
 
-__PACKAGE__->mk_accessors(qw(name status raw));
+__PACKAGE__->mk_accessors(qw(raw));
 
 #################### subroutine header begin ####################
 
@@ -42,16 +42,12 @@ See Also   :
 
 sub new
 {
-    my ($class, %param) = @_;
+    my ($class, $param) = @_;
 
     my $self = bless ({}, ref ($class) || $class);
 
-    if (!$param{name}) {
-        die "name parameter is mandatory!";
-    };
+    $self->raw($param);
 
-    $self->name($param{name});
-    $self->status($param{status});
     return $self;
 }
 
