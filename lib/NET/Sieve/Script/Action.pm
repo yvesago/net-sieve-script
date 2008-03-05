@@ -6,11 +6,11 @@ __PACKAGE__->mk_accessors(qw(action command param));
 
 sub new
 {
-    my ($class, $param) = @_;
+    my ($class, $init) = @_;
 
     my $self = bless ({}, ref ($class) || $class);
 
-    my ($command, $param) = $param =~ m/(keep|discard|redirect|stop|reject|fileinto)(?: \"(.*?)\")?/; 
+    my ($command, $param) = $init =~ m/(keep|discard|redirect|stop|reject|fileinto)(?: \"(.*?)\")?/; 
 
     $self->command($command);
     $self->param($param);
