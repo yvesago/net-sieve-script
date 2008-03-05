@@ -29,7 +29,7 @@ my $test_script2='require ["fileinto","reject","vacation","imapflags","relationa
 if header :contains "Received" "compilerlist@example.com"
 {
   fileinto "mlists.compiler";
-  stop;
+#  stop;
 }
 if header :regex :comparator "i;ascii-casemap" "Subject" "^Release notice:"
 {
@@ -60,7 +60,6 @@ use_ok( 'NET::Sieve::Script::Action' );
 
 #    print $script->raw."\n";
 #    print $script->parse_ok."\n";
-#    $object->rules();
     foreach my $rule ($object->rules()) {
       print "\n=rule:".$rule->priority.' '.$rule->alternate."\n";
 
@@ -70,9 +69,7 @@ use_ok( 'NET::Sieve::Script::Action' );
       print "   ".$condition->key_list."\n";
 
       print "==actions\n";
-      my @commands = @{$rule->actions()};
-      foreach my $command (@commands) {
-#	  foreach my $command ($rule->actions() ) {
+	  foreach my $command ( $rule->actions() ) {
           print $command->command.' '.$command->param."\n";
       }
 #      my @conditions = @{$rule->conditions()};
