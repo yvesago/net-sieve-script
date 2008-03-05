@@ -56,14 +56,12 @@ use_ok( 'NET::Sieve::Script::Rule' );
 use_ok( 'NET::Sieve::Script::Condition' );
 use_ok( 'NET::Sieve::Script::Action' );
 
-exit;
+#exit;
 
-    print $object->name."\n";
-    print $object->status."\n";
 #    print $script->raw."\n";
 #    print $script->parse_ok."\n";
 #    $object->rules();
-    foreach my $rule (@{$object->rules}) {
+    foreach my $rule ($object->rules()) {
       print "\n=rule:".$rule->priority.' '.$rule->alternate."\n";
 
       print "==conditions\n";
@@ -74,6 +72,7 @@ exit;
       print "==actions\n";
       my @commands = @{$rule->actions()};
       foreach my $command (@commands) {
+#	  foreach my $command ($rule->actions() ) {
           print $command->command.' '.$command->param."\n";
       }
 #      my @conditions = @{$rule->conditions()};

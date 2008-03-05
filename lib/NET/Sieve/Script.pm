@@ -80,7 +80,8 @@ sub rules
         my $pRule = new NET::Sieve::Script::Rule;
         
         ++$order;
-        $pRule->alternate(1) if ( $ctrl ne 'if' );
+		# TODO break if more than 50 rules
+        $pRule->alternate($ctrl);
         $pRule->priority($order);
 
         my @Actions;
@@ -96,7 +97,7 @@ sub rules
         push @Rules, $pRule;
     };
 
-return \@Rules;
+return @Rules;
 
 # set rules
     if ( defined $rule ) {
