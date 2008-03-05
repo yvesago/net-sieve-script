@@ -1,11 +1,7 @@
 package NET::Sieve::Script;
 use strict;
 
-=head1 
-
-http://www.ietf.org/rfc/rfc3028.txt
-
-=cut
+# http://www.ietf.org/rfc/rfc3028.txt
 
 BEGIN {
     use Exporter ();
@@ -130,7 +126,7 @@ return \@Rules;
 
 =head1 NAME
 
-NET::Sieve::Script - Module abstract (<= 44 characters) goes here
+NET::Sieve::Script - parse and write sieve scripts
 
 =head1 SYNOPSIS
 
@@ -140,24 +136,20 @@ NET::Sieve::Script - Module abstract (<= 44 characters) goes here
 
 =head1 DESCRIPTION
 
-Stub documentation for this module was created by ExtUtils::ModuleMaker.
-It looks like the author of the extension was negligent enough
-to leave the stub unedited.
+B<WARNING!!! This module is still in early alpha stage. It is recommended
+that you use it only for testing.>
 
-Blah blah blah.
+http://www.ietf.org/rfc/rfc3028.txt
 
+=head1 CONSTRUCTOR
 
-=head1 USAGE
+=head2 new
 
-
+=head1 METHODS
 
 =head1 BUGS
 
-
-
 =head1 SUPPORT
-
-
 
 =head1 AUTHOR
 
@@ -178,7 +170,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-perl(1).
+L<NET::Sieve>
 
 =cut
 
