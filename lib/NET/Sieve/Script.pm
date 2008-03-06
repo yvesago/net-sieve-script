@@ -89,7 +89,7 @@ sub rules
         foreach my $command (@commands) {
             push @Actions, NET::Sieve::Script::Action->new($command);
         };
-        $pRule->actions($Actions[0]);
+        $pRule->actions(\@Actions);
 
         my $cond = NET::Sieve::Script::Condition->new($test_list);
         $pRule->conditions($cond);

@@ -65,20 +65,23 @@ use_ok( 'NET::Sieve::Script::Action' );
 
       print "==conditions\n";
       my $condition = $rule->conditions();
-      print $condition->not.' '.$condition->test."\n";
-      print "   ".$condition->key_list."\n";
+      print ' **'.$condition->not.' '.$condition->test;
+      if (defined $rule->conditions->condition() ) {
+        my @conditions = @{$rule->conditions->condition()};
+        foreach my $condition (@conditions) {
+         print  '  *'.$condition->not.' '.$condition->test.' '.$condition->match_type.' '
+          .$condition->header_list.' '.$condition->key_list."\n";
+        }
+      } else {
+        print  '  '.$condition->match_type.' ';
+        print  .$condition->header_list.' '.$condition->key_list."\n";
+      }
 
       print "==actions\n";
-	  foreach my $command ( $rule->actions() ) {
-          print $command->command.' '.$command->param."\n";
+     
+	  foreach my $command ( @{$rule->actions()} ) {
+          print ' >'.$command->command.' '.$command->param."\n";
       }
-#      my @conditions = @{$rule->conditions()};
-#      foreach my $condition (@conditions) {
-#        print $condition->cond_type."\n"; #AND OR / allof anyof 
-#        print  $condition->header.' '.$condition->field.' '.
-#               $condition->test.' '.$condition->param."\n";
-#      }
-#    print $script->action->type." ".$script->action->param."\n";
-     #print $script->more_action."\n";
+    
     }
 

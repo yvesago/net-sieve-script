@@ -38,7 +38,7 @@ foreach my $string (@strings) {
     if (defined $cond->condition() ) {
         foreach my $sub_cond (@{$cond->condition()}) {
             print $sub_cond->not.' '.$sub_cond->test."\n";
-            print "  __".$sub_cond->header_list."__".$sub_cond->key_list."__\n";
+            print " --->  __".$sub_cond->header_list."__".$sub_cond->key_list."__ <---\n";
         } 
     } else {
         print "  __".$cond->header_list."__".$cond->key_list."__\n";
