@@ -110,7 +110,6 @@ use_ok( 'NET::Sieve::Script::Rule' );
 use_ok( 'NET::Sieve::Script::Condition' );
 use_ok( 'NET::Sieve::Script::Action' );
 
-#exit;
 
 #    print $script->raw."\n";
 #    print $script->parse_ok."\n";
@@ -122,3 +121,5 @@ use_ok( 'NET::Sieve::Script::Action' );
 print "\n";
 
 #TODO test $object->swap_rules(1,5);
+#TODO test $object->remove_rule(3);
+#TODO test $object->del_rule(3);
