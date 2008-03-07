@@ -16,8 +16,6 @@ BEGIN {
 
 use base qw(Class::Accessor::Fast);
 use NET::Sieve::Script::Rule;
-use NET::Sieve::Script::Condition;
-use NET::Sieve::Script::Action;
 
 __PACKAGE__->mk_accessors(qw(raw));
 
@@ -75,24 +73,16 @@ sub rules
         my $test_list = $2;
         my $block = $3;
 
-#        print "$order cond:".$2."\n";
-#        print "$order act:".$3."\n";
-        my $pRule = new NET::Sieve::Script::Rule;
-        
         ++$order;
+
+        my $pRule = NET::Sieve::Script::Rule->new (
+            ctrl => $ctrl,
+            test_list => $test_list,
+            block => $block,
+            order => $order
+            );
+        
 		# TODO break if more than 50 rules
-        $pRule->alternate($ctrl);
-        $pRule->priority($order);
-
-        my @Actions;
-        my @commands = split( ';' , $block);
-        foreach my $command (@commands) {
-            push @Actions, NET::Sieve::Script::Action->new($command);
-        };
-        $pRule->actions(\@Actions);
-
-        my $cond = NET::Sieve::Script::Condition->new($test_list);
-        $pRule->conditions($cond);
 
         push @Rules, $pRule;
     };
@@ -114,6 +104,13 @@ return @Rules;
 
 
 
+}
+
+sub swap_rules
+{
+    my $self = shift;
+    my $new = shift;
+    my $old = shift;
 }
 
 #################### main pod documentation begin ###################

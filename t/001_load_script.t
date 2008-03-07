@@ -48,9 +48,63 @@ if header :is "Subject" "Daily virus scan reminder"
   stop;
 }';
 
-$object->raw($test_script2);
+my $test_script3 = '
+    # Example Sieve Filter
+    require ["fileinto", "reject"];
 
-is ($object->raw, $test_script2, "set raw script");
+    #
+    if size :over 1M
+            {
+            reject text:
+    Please do not send me large attachments.
+    Put your file on a server and send me the URL.
+    Thank you.
+    .... Fred
+    .
+    ;
+            stop;
+            }
+    #
+
+    # Handle messages from known mailing lists
+    # Move messages from IETF filter discussion list to filter folder
+    #
+    if header :is "Sender" "owner-ietf-mta-filters@imc.org"
+            {
+            fileinto "filter";  # move to "filter" folder
+            }
+    #
+    # Keep all messages to or from people in my company
+    #
+    elsif address :domain :is ["From", "To"] "example.com"
+            {
+            keep;               # keep in "In" folder
+            }
+
+    #
+    # Try and catch unsolicited email.  If a message is not to me,
+    # or it contains a subject known to be spam, file it away.
+    #
+    elsif anyof (not address :all :contains
+                   ["To", "Cc", "Bcc"] "me@example.com",
+                 header :matches "subject"
+                   ["*make*money*fast*", "*university*dipl*mas*"])
+            {
+            # If message header does not contain my address,
+            # it s from a list.
+            fileinto "spam";   # move to "spam" folder
+            }
+    else
+            {
+            # Move all other (non-company) mail to "personal"
+            # folder.
+            fileinto "personal";
+            }
+';
+
+$object->raw($test_script3);
+
+is ($object->raw, $test_script3, "set raw script");
 
 use_ok( 'NET::Sieve::Script::Rule' );
 use_ok( 'NET::Sieve::Script::Condition' );
@@ -61,17 +115,10 @@ use_ok( 'NET::Sieve::Script::Action' );
 #    print $script->raw."\n";
 #    print $script->parse_ok."\n";
     foreach my $rule ($object->rules()) {
-      print "\n=rule:".$rule->priority.' '.$rule->alternate."\n";
-
-      print "==conditions\n";
-      my $condition = $rule->conditions();
-      print ' **'.$condition->write."\n";
-
-      print "==actions\n";
-     
-	  foreach my $command ( @{$rule->actions()} ) {
-          print ' >'.$command->command.' '.$command->param."\n";
-      }
-    
+      print "\n=rule:".$rule->priority."\n";
+      print $rule->write;
     }
 
+print "\n";
+
+#TODO test $object->swap_rules(1,5);

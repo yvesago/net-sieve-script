@@ -105,7 +105,7 @@ sub write {
             $text_condition .= "\n".(' ' x $recursiv_level).'  '.$sub_cond->_write_test().','
         }
         $text_condition =~ s/,$//;
-        $text_condition .= "\n".' ' x $recursiv_level.")\n";
+        $text_condition .= ' )';
     } 
     else {
         $text_condition = $self->_write_test();
