@@ -1,5 +1,13 @@
 TODO list for Perl module NET::Sieve::Script
 
 - write doc
-
-
+- _trim method
+- _strip method
+- :over
+- swap rules
+- delete rule
+- add rulle
+- chg alternate on order
+- vrfy RFC for match/case order
+- more tests case
+- manage comment rules
