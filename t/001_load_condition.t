@@ -9,39 +9,34 @@ use lib qw(lib);
 
 BEGIN { use_ok( 'NET::Sieve::Script::Condition' ); }
 
-#my $string = 'header :contains :comparator "i;octet" "Subject" "MAKE MONEY FAST"';
+my $bad_string = 'header :comparator "i;octet" :contains "i;octet" "Subject" "MAKE MONEY FAST"';
+
 my @strings = (
 'header :contains :comparator "i;octet" "Subject" "MAKE MONEY FAST"',
 'header :contains "x-attached" [".exe",".bat",".js"]',
 'not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"]',
-'allof ( address :domain :is "X-Delivered-To" "mydomain.info", not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"])',
+'allof ( address :domain :is "X-Delivered-To" "mydomain.info", not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"] )',
+'allof ( address :is "X-Delivered-To" "mydomain.info", not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"] )',
 'header :contains ["from","cc"] "from-begin@begin.fr"',
 'header :contains ["from","cc"] [ "from-begin@begin.fr", "sex.com newsletter"]',
+'header :matches :comparator "i;ascii-casemap" "Subject" "^Output file listing from [a-z]*backup$"'
 );
 
-my $s='"mydomain.info", not address :localpart :is ["from","cc"] ["address1", "address2", "address3"], mydomain.info"';
-
-#$s=~s/",\s?"/" "/g;
-$_=$s;
-#substr($_,index$_,'[')=~y/,//d;
-1 while s/(\[[^\]]+?)",\s*/$1" /;
-print $_."\n";
-#exit ;
-#use Data::Dumper;
+isnt (NET::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string');
 
 foreach my $string (@strings) {
-    print "\n=>".$string."\n";
+
+    $string =~ s/","/", "/g;
+    $string =~ s/\[\s+"/\["/g;
+    $string =~ s/"\s+]/"\]/g;
+
     my $cond = NET::Sieve::Script::Condition->new($string);
+    my $resp = $cond->write;
 
-    print $cond->not.' '.$cond->test."\n";
+    $resp =~ s/[\n\r]//g;
+    $resp =~ s/ +/ /g;
+    $resp =~ s/^ +//;
+    $resp =~ s/ +$//;
 
-    if (defined $cond->condition() ) {
-        foreach my $sub_cond (@{$cond->condition()}) {
-            print $sub_cond->not.' '.$sub_cond->test."\n";
-            print " --->  __".$sub_cond->header_list."__".$sub_cond->key_list."__ <---\n";
-        } 
-    } else {
-        print "  __".$cond->header_list."__".$cond->key_list."__\n";
-    }
-    
+    is ($resp,$string,'test string');
 };

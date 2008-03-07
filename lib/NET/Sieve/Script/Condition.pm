@@ -10,10 +10,12 @@ sub new
 
     my $self = bless ({}, ref ($class) || $class);
 
-    my @ADDRESS_PART = qw(:all |:localpart |:domain );
+    my @ADDRESS_PART = qw((:all |:localpart |:domain ));
     #Syntax:   ":comparator" <comparator-name: string>
     my @COMPARATOR_NAME = qw(i;octet|i;ascii-casemap);
-    my @MATCH_TYPE = qw(:is |:contains |:matches );
+    my @MATCH_TYPE = qw((:is |:contains |:matches ));
+    #my @MATCH_TYPE = qw((:(?:(?:is|contains)|matches) ));
+    #my @MATCH_TYPE = qw((:\w+ ));
     # match : <header-list: string-list> <key-list: string-list>
     my @LISTS = qw((\[.*?\]|".*?"));
 
@@ -37,6 +39,7 @@ sub new
 
     # substitute ',' separator by ' ' in string-list
     # to easy parse test-list
+    # better :  1 while ($args =~ s/(\[[^\]]+?)",\s*/$1" /);
     $args =~ s/",\s?"/" "/g;
 
     # recursiv search for more condtions
@@ -44,7 +47,6 @@ sub new
         my @condition_list;
         my @condition_list_string = split ( ',', $1 );
         foreach my $sub_condition (@condition_list_string) {
-#            print "\n====>".$sub_condition."\n";
             push @condition_list, NET::Sieve::Script::Condition->new($sub_condition);
         }
         $self->condition(\@condition_list);
@@ -54,17 +56,19 @@ sub new
     # RFC Syntax : address [ADDRESS-PART] [COMPARATOR] [MATCH-TYPE]
     #             <header-list: string-list> <key-list: string-list>
     if ( $test eq 'address' ) {
-      ($address,$comparator,$match,$string,$key_list) = $args =~ m/(@ADDRESS_PART)?(:comparator "(?:@COMPARATOR_NAME)" )?(@MATCH_TYPE)?@LISTS @LISTS$/;
+      ($address,$comparator,$match,$string,$key_list) = $args =~ m/@ADDRESS_PART?(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/;
     };
     # RFC Syntax : envelope [COMPARATOR] [ADDRESS-PART] [MATCH-TYPE]
     #             <envelope-part: string-list> <key-list: string-list>
     if ( $test eq 'envelope' ) {
-      ($comparator,$address,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?(@ADDRESS_PART)?(@MATCH_TYPE)?@LISTS @LISTS$/;
+      ($comparator,$address,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@ADDRESS_PART?@MATCH_TYPE?@LISTS @LISTS$/;
     };
     # RFC Syntax : header [COMPARATOR] [MATCH-TYPE]
     #             <header-names: string-list> <key-list: string-list>
     if ( $test eq 'header' ) {
-      ($comparator,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?(@MATCH_TYPE)?@LISTS @LISTS$/gi;
+      #XXX see RFC ! match type and comparator OR comparator and match type ?
+      #($comparator,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/gi;
+      ($comparator,$match,$string,$key_list) = $args =~ m/@MATCH_TYPE?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
     };
     # RFC Syntax : size <":over" / ":under"> <limit: number>
     #TODO match size
@@ -78,6 +82,71 @@ sub new
 
     return $self;
 }
+
+=head2 write
+
+ Purpose  : write rule conditions
+ Return   : multi-line formated text
+
+=cut
+
+sub write {
+    my $self = shift;
+    my $recursiv_level = shift || 0;
+    my $text_condition = "";
+
+    $recursiv_level++;
+    if (defined $self->condition() ) {
+        $text_condition = ' ' x $recursiv_level;
+        $text_condition .= $self->not.' ' if ($self->not);
+        $text_condition .= $self->test." ( ";
+        foreach my $sub_cond ( @{$self->condition()} ) {
+            $sub_cond->write($recursiv_level) if (defined $sub_cond->condition() );
+            $text_condition .= "\n".(' ' x $recursiv_level).'  '.$sub_cond->_write_test().','
+        }
+        $text_condition =~ s/,$//;
+        $text_condition .= "\n".' ' x $recursiv_level.")\n";
+    } 
+    else {
+        $text_condition = $self->_write_test();
+    };
+
+    return $text_condition;
+}
+
+# private method
+# _write_test
+# return single line text
+
+sub _write_test {
+    my $self = shift;
+    my $line = $self->not.' '.$self->test.' ';
+   
+   my $comparator = ':comparator '.$self->comparator if ($self->comparator);
+   
+    if ( $self->test eq 'address' ) {
+        $line .= $self->address_part.' '.$comparator;
+    }
+    elsif ( $self->test eq 'envelope' ) {
+        $line .= $comparator.' '.$self->address_part;
+    }
+    elsif ( $self->test eq 'header' ) {
+        $line .= $self->comparator;
+    };
+#TODO size
+
+    $line.=' '.$self->match_type.' '.$self->header_list.' '.$self->key_list;
+
+    $line =~ s/^\s+//;
+    $line =~ s/\s+$//;
+    $line =~ s/ +/ /g;
+    # restore ", " in [ ]
+    1 while ( $line =~ s/(\[[^\]]+?)" "/$1", "/);
+
+    return $line;
+}
+
+
 =head1 NAME
 
 NET::Sieve::Script::Condition - parse and write conditions in sieve scripts

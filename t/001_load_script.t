@@ -65,17 +65,7 @@ use_ok( 'NET::Sieve::Script::Action' );
 
       print "==conditions\n";
       my $condition = $rule->conditions();
-      print ' **'.$condition->not.' '.$condition->test;
-      if (defined $rule->conditions->condition() ) {
-        my @conditions = @{$rule->conditions->condition()};
-        foreach my $condition (@conditions) {
-         print  '  *'.$condition->not.' '.$condition->test.' '.$condition->match_type.' '
-          .$condition->header_list.' '.$condition->key_list."\n";
-        }
-      } else {
-        print  '  '.$condition->match_type.' ';
-        print  .$condition->header_list.' '.$condition->key_list."\n";
-      }
+      print ' **'.$condition->write."\n";
 
       print "==actions\n";
      
