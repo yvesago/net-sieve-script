@@ -38,7 +38,7 @@ sub write
             $self->write_condition."\n".
             '    {'.
             "\n".$self->write_action.
-            '    }';
+            '    } ';
 }
 
 sub write_condition
@@ -56,6 +56,7 @@ sub write_action
     my $actions;
 
     foreach my $command ( @{$self->actions()} ) {
+            last if (!$command->command);
             $actions .= '    '.$command->command;
             $actions .= ' "'.$command->param.'"' if ($command->param);
             $actions .= ";\n";

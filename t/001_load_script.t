@@ -111,14 +111,18 @@ use_ok( 'NET::Sieve::Script::Condition' );
 use_ok( 'NET::Sieve::Script::Action' );
 
 
+my $res_script;
 #    print $script->raw."\n";
 #    print $script->parse_ok."\n";
     foreach my $rule ($object->rules()) {
       print "\n=rule:".$rule->priority."\n";
       print $rule->write;
+      $res_script .= $rule->write;
     }
 
 print "\n";
+
+is ($object->_strip, $object->_strip($res_script), "");
 
 #TODO test $object->swap_rules(1,5);
 #TODO test $object->remove_rule(3);

@@ -54,16 +54,7 @@ sub rules
     my ($self, $action, $rule, $priority ) = @_;
     
     #read rules from raw
-    my $script_raw = $self->raw();
-    $script_raw =~ s/\#.*//g;      # hash-comment
-    $script_raw =~ s!/\*.*.\*/!!g; # bracket-comment
-    $script_raw =~ s/^require.*//gi;
-    $script_raw =~ s/\t/ /g;  # white-space
-    $script_raw =~ s/  +/ /g; # white-space
-    $script_raw =~ s/^ //;
-    $script_raw =~ s/ $//;
-    #TODO better multi-line support : multi-line-dotstuff
-    $script_raw =~ s/[\n\r]//g;
+    my $script_raw = $self->_strip();
 
     my @Rules;
 
@@ -111,6 +102,27 @@ sub swap_rules
     my $self = shift;
     my $new = shift;
     my $old = shift;
+}
+
+# _strip
+# strip a string or strip raw
+# return a string
+
+sub _strip {
+	my $self = shift;
+	my $script_raw = shift || $self->raw();
+
+    $script_raw =~ s/\#.*//g;      # hash-comment
+    $script_raw =~ s!/\*.*.\*/!!g; # bracket-comment
+    $script_raw =~ s/^require.*//gi;
+    $script_raw =~ s/\t/ /g;  # white-space
+    $script_raw =~ s/\s+/ /g; # white-space
+    $script_raw =~ s/^ //;
+    $script_raw =~ s/ $//;
+    #TODO better multi-line support : multi-line-dotstuff
+    $script_raw =~ s/[\n\r]//g;
+
+	return $script_raw;
 }
 
 #################### main pod documentation begin ###################
