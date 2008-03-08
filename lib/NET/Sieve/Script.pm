@@ -104,9 +104,10 @@ sub swap_rules
     my $old = shift;
 }
 
-# _strip
-# strip a string or strip raw
-# return a string
+# function _strip
+#  strip a string or strip raw
+#  return a string
+# usefull for parsing or test
 
 sub _strip {
 	my $self = shift;
@@ -117,10 +118,10 @@ sub _strip {
     $script_raw =~ s/^require.*//gi;
     $script_raw =~ s/\t/ /g;  # white-space
     $script_raw =~ s/\s+/ /g; # white-space
-    $script_raw =~ s/^ //;
-    $script_raw =~ s/ $//;
-    #TODO better multi-line support : multi-line-dotstuff
-    $script_raw =~ s/[\n\r]//g;
+    $script_raw =~ s/\(\s+/\(/g; #  remove white-space after ( 
+    $script_raw =~ s/\s+\)/\)/g; # remove white-space before )
+    $script_raw =~ s/^\s+//;
+    $script_raw =~ s/\s+$//;
 
 	return $script_raw;
 }

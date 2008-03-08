@@ -2,7 +2,7 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 use strict;
 
 use lib qw(lib);
@@ -122,7 +122,7 @@ my $res_script;
 
 print "\n";
 
-is ($object->_strip, $object->_strip($res_script), "");
+is ($object->_strip,'require ["fileinto", "reject"]; '. $object->_strip($res_script), "");
 
 #TODO test $object->swap_rules(1,5);
 #TODO test $object->remove_rule(3);

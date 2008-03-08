@@ -58,8 +58,8 @@ sub write_action
     foreach my $command ( @{$self->actions()} ) {
             last if (!$command->command);
             $actions .= '    '.$command->command;
-            $actions .= ' "'.$command->param.'"' if ($command->param);
-            $actions .= ";\n";
+            $actions .= ' '.$command->param if ($command->param);
+			$actions .= ";\n";
     }
 
     return $actions;

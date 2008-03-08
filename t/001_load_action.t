@@ -10,14 +10,14 @@ my $command = ' fileinto "INBOX.spam" ';
 my $action = NET::Sieve::Script::Action->new($command);
 
 is ( $action->command, 'fileinto', "command fileinto");
-is ( $action->param, 'INBOX.spam', "param INBOX.spam");
+is ( $action->param, '"INBOX.spam"', "param INBOX.spam");
 
 $action = NET::Sieve::Script::Action->new('stop');
 is ( $action->command, 'stop', "command stop");
 
 $action = NET::Sieve::Script::Action->new('redirect "bart@example.edu"');
 is ( $action->command, 'redirect', "command redirect");
-is ( $action->param, 'bart@example.edu', 'param bart@example.edu');
+is ( $action->param, '"bart@example.edu"', 'param bart@example.edu');
 
 $action = NET::Sieve::Script::Action->new('nimp "bart@example.edu"');
 is ( $action->command, undef, "undef for command nimp");
