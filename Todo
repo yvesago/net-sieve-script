@@ -3,7 +3,7 @@ TODO list for Perl module NET::Sieve::Script
 - write doc
 - _trim method
 * _strip method
-- :over
+* :over
 - swap rules
 - delete rule
 - add rule

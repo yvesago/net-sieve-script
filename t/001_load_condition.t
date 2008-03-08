@@ -19,7 +19,8 @@ my @strings = (
 'allof ( address :is "X-Delivered-To" "mydomain.info", not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"] )',
 'header :contains ["from","cc"] "from-begin@begin.fr"',
 'header :contains ["from","cc"] [ "from-begin@begin.fr", "sex.com newsletter"]',
-'header :matches :comparator "i;ascii-casemap" "Subject" "^Output file listing from [a-z]*backup$"'
+'header :matches :comparator "i;ascii-casemap" "Subject" "^Output file listing from [a-z]*backup$"',
+'size :over 1M'
 );
 
 isnt (NET::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string');

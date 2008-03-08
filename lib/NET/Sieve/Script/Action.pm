@@ -10,8 +10,12 @@ sub new
 
     my $self = bless ({}, ref ($class) || $class);
 
-    my ($command, $param) = $init =~ m/(keep|discard|redirect|stop|reject|fileinto)(?: \"(.*?)\")?/; 
+	my @MATCH = qw((?:\s(\"(.*?)\"|(.*?) \.)));
+	#my @MATCH = qw((?:\s\"(.*?)\"));
 
+    my ($command, $param) = $init =~ m/(keep|discard|redirect|stop|reject|fileinto)@MATCH?/gi;
+
+	$param =~ s/\"//g;
     $self->command($command);
     $self->param($param);
 

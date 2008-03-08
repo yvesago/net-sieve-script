@@ -14,6 +14,7 @@ sub new
     #Syntax:   ":comparator" <comparator-name: string>
     my @COMPARATOR_NAME = qw(i;octet|i;ascii-casemap);
     my @MATCH_TYPE = qw((:is |:contains |:matches ));
+    my @MATCH_SIZE = qw((:over |:under ));
     #my @MATCH_TYPE = qw((:(?:(?:is|contains)|matches) ));
     #my @MATCH_TYPE = qw((:\w+ ));
     # match : <header-list: string-list> <key-list: string-list>
@@ -71,7 +72,9 @@ sub new
       ($comparator,$match,$string,$key_list) = $args =~ m/@MATCH_TYPE?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
     };
     # RFC Syntax : size <":over" / ":under"> <limit: number>
-    #TODO match size
+    if ( $test eq 'size'  ) {
+      ($match,$string) = $args =~ m/@MATCH_SIZE(.*)$/gi;
+	};
 
     $self->address_part($address);
     $self->match_type($match);
@@ -132,8 +135,7 @@ sub _write_test {
     }
     elsif ( $self->test eq 'header' ) {
         $line .= $self->comparator;
-    };
-#TODO size
+	};
 
     $line.=' '.$self->match_type.' '.$self->header_list.' '.$self->key_list;
 
