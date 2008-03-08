@@ -13,7 +13,9 @@ sub new
     my @ADDRESS_PART = qw((:all |:localpart |:domain ));
     #Syntax:   ":comparator" <comparator-name: string>
     my @COMPARATOR_NAME = qw(i;octet|i;ascii-casemap);
-    my @MATCH_TYPE = qw((:is |:contains |:matches ));
+    # my @MATCH_TYPE = qw((:is |:contains |:matches ));
+	# regex not in rfc
+    my @MATCH_TYPE = qw((:is |:contains |:matches |:regex ));
     my @MATCH_SIZE = qw((:over |:under ));
     #my @MATCH_TYPE = qw((:(?:(?:is|contains)|matches) ));
     #my @MATCH_TYPE = qw((:\w+ ));

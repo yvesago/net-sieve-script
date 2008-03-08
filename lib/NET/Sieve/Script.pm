@@ -17,7 +17,7 @@ BEGIN {
 use base qw(Class::Accessor::Fast);
 use NET::Sieve::Script::Rule;
 
-__PACKAGE__->mk_accessors(qw(raw));
+__PACKAGE__->mk_accessors(qw(raw rules require));
 
 #################### subroutine header begin ####################
 
@@ -45,16 +45,44 @@ sub new
     my $self = bless ({}, ref ($class) || $class);
 
     $self->raw($param);
+    $self->read_rules();
+
+#TODO set require
 
     return $self;
 }
 
-sub rules
+=head2 write_rules
+
+return rules ordered by priority in text format
+
+=cut
+
+sub write_rules {
+    my $self = shift;
+    my $text;
+
+    foreach my $rule ( sort { $a->priority <=> $b->priority } @{$self->rules()} ) {
+      $text .= $rule->write."\n";
+    }
+
+    return $text;
+}
+
+=head2 read_rules
+
+Read rules from raw or from $text_rules if set
+set ->rules()
+Return 1 on success;
+
+=cut
+
+sub read_rules
 {
-    my ($self, $action, $rule, $priority ) = @_;
+    my ($self,$text_rules) = @_;
     
-    #read rules from raw
-    my $script_raw = $self->_strip();
+    #read rules from raw or from $text_rules if set
+    my $script_raw = $self->_strip($text_rules);
 
     my @Rules;
 
@@ -78,24 +106,14 @@ sub rules
         push @Rules, $pRule;
     };
 
-return @Rules;
+    $self->rules(\@Rules);
 
-# set rules
-    if ( defined $rule ) {
-        if ( $action eq 'add' ) { 
-            print "add rule\n";
-        } 
-        elsif ( $action eq 'del' ) {
-            print "remove rule\n";
-        }
-        elsif ( $action eq 'update' ) {
-            print "update rule\n";
-        };
-    };
-
-
-
+    return 1;
 }
+
+=head2 swap_rules
+
+=cut
 
 sub swap_rules
 {
@@ -104,7 +122,7 @@ sub swap_rules
     my $old = shift;
 }
 
-# function _strip
+# private function _strip
 #  strip a string or strip raw
 #  return a string
 # usefull for parsing or test
@@ -120,6 +138,8 @@ sub _strip {
     $script_raw =~ s/\s+/ /g; # white-space
     $script_raw =~ s/\(\s+/\(/g; #  remove white-space after ( 
     $script_raw =~ s/\s+\)/\)/g; # remove white-space before )
+    $script_raw =~ s/\[\s+/\[/g; #  remove white-space after [ 
+    $script_raw =~ s/\s+\]/\]/g; # remove white-space before ]
     $script_raw =~ s/^\s+//;
     $script_raw =~ s/\s+$//;
 

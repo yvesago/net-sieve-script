@@ -2,7 +2,7 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use strict;
 
 use lib qw(lib);
@@ -18,11 +18,14 @@ if header :contains "Subject" "[Test]" {
 my $object = NET::Sieve::Script->new ();
 isa_ok ($object, 'NET::Sieve::Script');
 
+use_ok( 'NET::Sieve::Script::Rule' );
+use_ok( 'NET::Sieve::Script::Condition' );
+use_ok( 'NET::Sieve::Script::Action' );
+
 my $object = NET::Sieve::Script->new ($test_script);
 isa_ok ($object, 'NET::Sieve::Script');
 
-
-is ($object->raw, $test_script, "raw script");
+is ($object->raw, $test_script, "set in raw for simple script");
 #print length($object->raw);
 
 my $test_script2='require ["fileinto","reject","vacation","imapflags","relational","comparator-i;ascii-numeric","regex","notify"];
@@ -102,27 +105,22 @@ my $test_script3 = '
             }
 ';
 
+
 $object->raw($test_script3);
-
-is ($object->raw, $test_script3, "set raw script");
-
-use_ok( 'NET::Sieve::Script::Rule' );
-use_ok( 'NET::Sieve::Script::Condition' );
-use_ok( 'NET::Sieve::Script::Action' );
+is ($object->raw, $test_script3, "set raw script3");
 
 
-my $res_script;
-#    print $script->raw."\n";
-#    print $script->parse_ok."\n";
-    foreach my $rule ($object->rules()) {
-      print "\n=rule:".$rule->priority."\n";
-      print $rule->write;
-      $res_script .= $rule->write;
-    }
+$object->read_rules();
+is ($object->_strip,'require ["fileinto", "reject"]; '. $object->_strip($object->write_rules), "parse raw");
 
-print "\n";
+#print $object->write_rules."\n";
+#set new rules
+$object->read_rules($test_script2);
 
-is ($object->_strip,'require ["fileinto", "reject"]; '. $object->_strip($res_script), "");
+my $res_script = $object->write_rules;
+is ($object->_strip($test_script2),$object->_strip($res_script), "parse script2");
+
+#print $res_script."\n";
 
 #TODO test $object->swap_rules(1,5);
 #TODO test $object->remove_rule(3);

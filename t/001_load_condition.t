@@ -2,7 +2,7 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use strict;
 
 use lib qw(lib);
