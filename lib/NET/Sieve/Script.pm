@@ -87,7 +87,7 @@ sub read_rules
     my @Rules;
 
     my $order;
-    while ($script_raw =~m/(if|else|elsif) (.*?){(.*?)}([\s;]?)/g) {
+    while ($script_raw =~m/(if|else|elsif) (.*?){(.*?)}([\s;]?)/isg) {
         my $ctrl = $1;
         my $test_list = $2;
         my $block = $3;
