@@ -61,13 +61,17 @@ return rules ordered by priority in text format
 sub write_rules {
     my $self = shift;
     my $text;
-	my %require;
+	my %require = ();
 
 #TODO set require
     foreach my $rule ( sort { $a->priority <=> $b->priority } @{$self->rules()} ) {
       $text .= $rule->write."\n";
+	  foreach my $req ($rule->require()) {
+	      $require{$req->[0]} = 1;
+	  }
     }
 
+print join (' ', sort keys %require ). "\n";
     return $text;
 }
 

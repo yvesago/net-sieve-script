@@ -2,23 +2,24 @@ package NET::Sieve::Script::Condition;
 use strict;
 use base qw(Class::Accessor::Fast);
 
-__PACKAGE__->mk_accessors(qw(test not condition key_list header_list address_part match_type comparator));
+__PACKAGE__->mk_accessors(qw(test not condition key_list header_list address_part match_type comparator require));
 
 sub new
 {
     my ($class, $param) = @_;
 
     my $self = bless ({}, ref ($class) || $class);
+	my $require;
 
     my @ADDRESS_PART = qw((:all |:localpart |:domain ));
     #Syntax:   ":comparator" <comparator-name: string>
     my @COMPARATOR_NAME = qw(i;octet|i;ascii-casemap);
-    # my @MATCH_TYPE = qw((:is |:contains |:matches ));
-	# regex not in rfc
-    my @MATCH_TYPE = qw((:is |:contains |:matches |:regex ));
+    # my @MATCH_TYPE = qw((:\w+ ));
+	# regex expired draft will be removed
+    my @MATCH_TYPE = qw((:is |:contains |:matches ));
     my @MATCH_SIZE = qw((:over |:under ));
-    #my @MATCH_TYPE = qw((:(?:(?:is|contains)|matches) ));
-    #my @MATCH_TYPE = qw((:\w+ ));
+    # match relationnal RFC 5231
+	my @MATCH_REL = qw((:value ".." |:count ".." ));
     # match : <header-list: string-list> <key-list: string-list>
     my @LISTS = qw((\[.*?\]|".*?"));
 
@@ -37,8 +38,8 @@ sub new
     $self->not($not);
     $self->test($test);
 
-    $args =~ s/^ +//;
-    $args =~ s/ +$//;
+    $args =~ s/^\s+//;
+    $args =~ s/\s+$//;
 
     # substitute ',' separator by ' ' in string-list
     # to easy parse test-list
@@ -69,14 +70,23 @@ sub new
     # RFC Syntax : header [COMPARATOR] [MATCH-TYPE]
     #             <header-names: string-list> <key-list: string-list>
     if ( $test eq 'header' ) {
-      #XXX see RFC ! match type and comparator OR comparator and match type ?
-      #($comparator,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/gi;
-      ($comparator,$match,$string,$key_list) = $args =~ m/@MATCH_TYPE?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
+      # only for regex old draft
+      ($match,$comparator,$string,$key_list) = $args =~ m/(:regex )?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
+      # RFC 5228 ! 
+	  if (!$match) {
+        ($comparator,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/gi;
+	  };
     };
     # RFC Syntax : size <":over" / ":under"> <limit: number>
     if ( $test eq 'size'  ) {
       ($match,$string) = $args =~ m/@MATCH_SIZE(.*)$/gi;
 	};
+    # find require
+    if ($match eq ':regex ') {
+	  push @{$require}, 'regex';
+	};
+	$self->require($require);
+
 
     $self->address_part($address);
     $self->match_type($match);
@@ -130,16 +140,26 @@ sub _write_test {
    my $comparator = ':comparator '.$self->comparator if ($self->comparator);
    
     if ( $self->test eq 'address' ) {
-        $line .= $self->address_part.' '.$comparator;
+        $line .= $self->address_part.' '.$comparator.' '.$self->match_type;
     }
     elsif ( $self->test eq 'envelope' ) {
-        $line .= $comparator.' '.$self->address_part;
+        $line .= $comparator.' '.$self->address_part.' '.$self->match_type;
     }
     elsif ( $self->test eq 'header' ) {
-        $line .= $self->comparator;
+		if ($self->match_type eq ':regex ') {
+            $line .= $self->match_type.' '.$self->comparator;
+		}
+		else {
+            $line .= $self->comparator.' '.$self->match_type;
+		}
+	}
+    elsif ( $self->test eq 'size' ) {
+		$line .= $self->match_type;
 	};
+	
 
-    $line.=' '.$self->match_type.' '.$self->header_list.' '.$self->key_list;
+    #$line.=' '.$self->match_type.' '.$self->header_list.' '.$self->key_list;
+    $line.=' '.$self->header_list.' '.$self->key_list;
 
     $line =~ s/^\s+//;
     $line =~ s/\s+$//;

@@ -4,14 +4,13 @@ use base qw(Class::Accessor::Fast);
 use  NET::Sieve::Script::Action;
 use NET::Sieve::Script::Condition;
 
-__PACKAGE__->mk_accessors(qw(alternate conditions actions priority));
+__PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
 
 sub new
 {
     my ($class, %param) = @_;
 
     my $self = bless ({}, ref ($class) || $class);
-
 
         $self->alternate($param{ctrl});
         $self->priority($param{order});
@@ -46,6 +45,13 @@ sub write_condition
     my $self = shift;
 
     return undef if ! $self->conditions;
+
+	if ( defined $self->conditions->require )  {
+      my $require = $self->require();
+	  push @{$require}, @{$self->conditions->require};
+	  $self->require($require);
+	};
+
     return $self->conditions->write();
 }
 
@@ -54,14 +60,19 @@ sub write_action
     my $self = shift;
 
     my $actions;
+    my $require = $self->require();
 
     foreach my $command ( @{$self->actions()} ) {
             last if (!$command->command);
             $actions .= '    '.$command->command;
             $actions .= ' '.$command->param if ($command->param);
 			$actions .= ";\n";
+			push (@{$require}, $command->command) if (
+              $command->command ne 'keep' &&
+              $command->command ne 'discard' &&
+              $command->command ne 'stop' ); # rfc 3528 4.) implementation MUST support 
     }
-
+	$self->require($require);
     return $actions;
 }
 

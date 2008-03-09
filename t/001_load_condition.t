@@ -9,21 +9,21 @@ use lib qw(lib);
 
 BEGIN { use_ok( 'NET::Sieve::Script::Condition' ); }
 
-my $bad_string = 'header :comparator "i;octet" :contains "i;octet" "Subject" "MAKE MONEY FAST"';
+my $bad_string = 'header :contains :comparator "i;octet" "i;octet" "Subject" "MAKE MONEY FAST"';
 
 my @strings = (
-'header :contains :comparator "i;octet" "Subject" "MAKE MONEY FAST"',
+'header :comparator "i;octet" :contains "Subject" "MAKE MONEY FAST"',
 'header :contains "x-attached" [".exe",".bat",".js"]',
 'not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"]',
 'allof ( address :domain :is "X-Delivered-To" "mydomain.info", not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"] )',
 'allof ( address :is "X-Delivered-To" "mydomain.info", not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"] )',
 'header :contains ["from","cc"] "from-begin@begin.fr"',
 'header :contains ["from","cc"] [ "from-begin@begin.fr", "sex.com newsletter"]',
-'header :matches :comparator "i;ascii-casemap" "Subject" "^Output file listing from [a-z]*backup$"',
+'header :comparator "i;ascii-casemap" :matches "Subject" "^Output file listing from [a-z]*backup$"',
 'size :over 1M'
 );
 
-isnt (NET::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string');
+isnt (NET::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string not RFC 5228');
 
 foreach my $string (@strings) {
 
@@ -35,9 +35,9 @@ foreach my $string (@strings) {
     my $resp = $cond->write;
 
     $resp =~ s/[\n\r]//g;
-    $resp =~ s/ +/ /g;
-    $resp =~ s/^ +//;
-    $resp =~ s/ +$//;
+    $resp =~ s/\s+/ /g;
+    $resp =~ s/^\s+//;
+    $resp =~ s/\s+$//;
 
     is ($resp,$string,'test string');
 };
