@@ -17,7 +17,7 @@ BEGIN {
 use base qw(Class::Accessor::Fast);
 use NET::Sieve::Script::Rule;
 
-__PACKAGE__->mk_accessors(qw(raw rules require));
+__PACKAGE__->mk_accessors(qw(raw rules require max_priority));
 
 #################### subroutine header begin ####################
 
@@ -54,7 +54,9 @@ sub new
 
 =head2 write_rules
 
-return rules ordered by priority in text format
+ Purpose : write script, ie require and rules 
+ Return  : set current require
+ return rules ordered by priority in text format
 
 =cut
 
@@ -63,7 +65,6 @@ sub write_rules {
     my $text;
 	my %require = ();
 
-#TODO set require
     foreach my $rule ( sort { $a->priority <=> $b->priority } @{$self->rules()} ) {
       $text .= $rule->write."\n";
 	  foreach my $req ($rule->require()) {
@@ -71,8 +72,20 @@ sub write_rules {
 	  }
     }
 
-print join (' ', sort keys %require ). "\n";
-    return $text;
+#TODO keep original require if current if include for test parsing
+    my $require_line;
+    my $count;
+    foreach my $req (sort keys %require) {
+	    next if(!$req);
+	    $require_line .= ', "'.$req.'"';
+	    $count++;
+    };
+    $require_line =~ s/^, //;
+    $require_line = '['.$require_line.']' if ($count > 1);
+
+	$self->require($require_line);
+
+    return "require $require_line;\n".$text;
 }
 
 =head2 read_rules
@@ -118,11 +131,14 @@ sub read_rules
     };
 
     $self->rules(\@Rules);
+	$self->max_priority($order);
 
     return 1;
 }
 
 =head2 swap_rules
+
+swap priority, take care of if/else/elsif
 
 =cut
 
@@ -131,6 +147,23 @@ sub swap_rules
     my $self = shift;
     my $new = shift;
     my $old = shift;
+}
+
+=head2 delete_rule
+
+delete rule take care for 'if' test
+
+ if deleted is 'if'
+  delete next if next is 'else'
+  change next in 'if' next is 'elsif'
+
+=cut
+
+sub delete_rule
+{
+    my $self = shift;
+    my $id = shift;
+
 }
 
 # private function _strip
@@ -152,8 +185,9 @@ sub _strip {
     $script_raw =~ s/\s+\]/\]/g; # remove white-space before ]
     $script_raw =~ s/^\s+//;
     $script_raw =~ s/\s+$//;
+    $script_raw =~ s/","/", "/g;
 #TODO: to remove write_rules will set require
-    $script_raw =~ s/require.*?["\]];\s+//sgi; #remove require
+    #$script_raw =~ s/require.*?["\]];\s+//sgi; #remove require
 
 	return $script_raw;
 }

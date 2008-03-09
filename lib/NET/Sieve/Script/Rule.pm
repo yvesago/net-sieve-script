@@ -70,6 +70,7 @@ sub write_action
 			push (@{$require}, $command->command) if (
               $command->command ne 'keep' &&
               $command->command ne 'discard' &&
+#              $command->command ne 'reject' &&
               $command->command ne 'stop' ); # rfc 3528 4.) implementation MUST support 
     }
 	$self->require($require);
