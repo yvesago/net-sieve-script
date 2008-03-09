@@ -2,7 +2,7 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 10;
+use Test::More tests => 13;
 use strict;
 
 use lib qw(lib);
@@ -28,6 +28,7 @@ isa_ok ($object, 'NET::Sieve::Script');
 is ($object->raw, $test_script, "set in raw for simple script");
 #print length($object->raw);
 
+is( $object->require,'"fileinto"',"match require in simple script");
 my $test_script2='require ["fileinto","reject","vacation","imapflags","relational","comparator-i;ascii-numeric","regex","notify"];
 if header :contains "Received" "compilerlist@example.com"
 {
@@ -109,18 +110,19 @@ my $test_script3 = '
 $object->raw($test_script3);
 is ($object->raw, $test_script3, "set raw script3");
 
-
+#read rules from raw
 $object->read_rules();
-is ($object->_strip,'require ["fileinto", "reject"]; '. $object->_strip($object->write_rules), "parse raw");
+is( $object->require,'["fileinto", "reject"]',"match require in script3");
+is ($object->_strip,$object->_strip($object->write_rules), "parse raw script3");
 
-#print $object->write_rules."\n";
-#set new rules
+#set new rules without raw
 $object->read_rules($test_script2);
 
-my $res_script = $object->write_rules;
-is ($object->_strip($test_script2),$object->_strip($res_script), "parse script2");
+is( $object->require,'["fileinto","reject","vacation","imapflags","relational","comparator-i;ascii-numeric","regex","notify"]',"match require script2");
 
-#print $res_script."\n";
+my $res_script = $object->write_rules;
+is ($object->_strip($test_script2),$object->_strip($res_script), "parse script2 (no raw)");
+
 
 #TODO test $object->swap_rules(1,5);
 #TODO test $object->remove_rule(3);

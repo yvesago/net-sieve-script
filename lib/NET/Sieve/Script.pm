@@ -43,11 +43,11 @@ sub new
     my ($class, $param) = @_;
 
     my $self = bless ({}, ref ($class) || $class);
+    my @LISTS = qw((\[.*?\]|".*?"));
 
     $self->raw($param);
+    $self->require($1) if ( $param =~ m/require @LISTS;/si );
     $self->read_rules();
-
-#TODO set require
 
     return $self;
 }
@@ -61,7 +61,9 @@ return rules ordered by priority in text format
 sub write_rules {
     my $self = shift;
     my $text;
+	my %require;
 
+#TODO set require
     foreach my $rule ( sort { $a->priority <=> $b->priority } @{$self->rules()} ) {
       $text .= $rule->write."\n";
     }
@@ -79,8 +81,13 @@ Return 1 on success;
 
 sub read_rules
 {
-    my ($self,$text_rules) = @_;
+    my $self = shift;
+    my $text_rules = shift || $self->raw();
+
+    my @LISTS = qw((\[.*?\]|".*?"));
     
+    $self->require($1) if ( $text_rules =~ m/require @LISTS;/si );
+
     #read rules from raw or from $text_rules if set
     my $script_raw = $self->_strip($text_rules);
 
@@ -128,12 +135,11 @@ sub swap_rules
 # usefull for parsing or test
 
 sub _strip {
-	my $self = shift;
-	my $script_raw = shift || $self->raw();
+    my $self = shift;
+    my $script_raw = shift || $self->raw();
 
     $script_raw =~ s/\#.*//g;      # hash-comment
     $script_raw =~ s!/\*.*.\*/!!g; # bracket-comment
-    $script_raw =~ s/^require.*//gi;
     $script_raw =~ s/\t/ /g;  # white-space
     $script_raw =~ s/\s+/ /g; # white-space
     $script_raw =~ s/\(\s+/\(/g; #  remove white-space after ( 
@@ -142,6 +148,8 @@ sub _strip {
     $script_raw =~ s/\s+\]/\]/g; # remove white-space before ]
     $script_raw =~ s/^\s+//;
     $script_raw =~ s/\s+$//;
+#TODO: to remove write_rules will set require
+    $script_raw =~ s/require.*?["\]];\s+//sgi; #remove require
 
 	return $script_raw;
 }
