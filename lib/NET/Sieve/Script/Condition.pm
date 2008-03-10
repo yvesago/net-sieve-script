@@ -29,7 +29,7 @@ sub new
     $param =~ s/\s+$//;
     $param =~ s/\t/ /g;
     $param =~ s/\s+/ /g;
-    $param =~ s/[\r\n]//gs;
+    #$param =~ s/[\r\n]//gs;
 
     return undef if 
         $param !~ m/^(not )?(address|enveloppe|header|size|allof|anyof|exists|false|true)(.*)/i;
@@ -46,12 +46,16 @@ sub new
 
     # substitute ',' separator by ' ' in string-list
     # to easy parse test-list
-    # better :  1 while ($args =~ s/(\[[^\]]+?)",\s*/$1" /);
+    # better :  
+    #1 while ($args =~ s/(\[[^\]]+?)",\s*/$1" /);
     $args =~ s/",\s?"/" "/g;
 
-    # recursiv search for more conditions
-    if ( $args =~ m/^\((.*)\)$/ ) { 
+    #TODO better recursiv search for more conditions
+    # now match only one level
+    while ( $args =~ m/\((.*?)\)/gs ) { 
+    #while ( $args =~ m/\([^\)](.*?)\)/gs ) { 
         my @condition_list;
+        #print "++ $1 ++\n";
         my @condition_list_string = split ( ',', $1 );
         foreach my $sub_condition (@condition_list_string) {
             push @condition_list, NET::Sieve::Script::Condition->new($sub_condition);

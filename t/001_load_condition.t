@@ -41,3 +41,35 @@ foreach my $string (@strings) {
 
     is ($resp,$string,'test string');
 };
+
+my $s1 = 'allof ( 
+    address :is "X-Delivered-To" "mydomain.info", 
+    not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"], 
+        allof ( header :contains "Subject" "Test", header :contains "Subject" "Test2" )
+   )';
+
+my $s2 = 'allof (
+ anyof ( 
+    header :contains ["From","Sender","Resent-from","Resent-sender","Return-path"] "xxx.com"
+ ),
+ anyof ( 
+        allof (
+          not header :matches ["Subject"," Keywords"] ["POSTMASTER-AUTO-FW:", "postmaster-auto-fw:"],
+          header :matches ["Subject"," Keywords"] "*"
+        ),
+        true
+        )
+ )';
+
+my $s3 ='anyof ( 
+  header :contains ["From","Sender","Resent-from","Resent-sender","Return-path"] "xxx.com",
+  header :contains ["Return-path"] "xxx.com"
+  ),
+allof (
+  not header :matches ["Subject"," Keywords"] ["POSTMASTER-AUTO-FW:", "postmaster-auto-fw:"],
+  header :matches ["Subject"," Keywords"] "*"
+  )';
+
+
+my $cond = NET::Sieve::Script::Condition->new($s3);
+#print $cond->write;
