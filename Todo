@@ -8,7 +8,7 @@ TODO list for Perl module NET::Sieve::Script
 * delete rule
 * add rule
 * find rule
-- add/find/swap/del actions
+* add/find/swap/del actions
 - add/find/swap/del conditions
 - chg alternate on order
 * vrfy RFC for match/case order

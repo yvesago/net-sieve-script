@@ -6,6 +6,19 @@ use NET::Sieve::Script::Condition;
 
 __PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
 
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    Arguments :
+        order =>     : optionnal set priority for rule
+        ctrl  =>     : optionnal default 'if', else could be 'else' or 'elsif'
+        test_list => : optionnal conditions
+        block =>     : optionnal block of commands
+    Returns   :   NET::Sieve::Script::Rule object
+
+=cut
+
 sub new
 {
     my ($class, %param) = @_;
@@ -33,6 +46,12 @@ sub new
     return $self;
 }
 
+=head2 write
+
+ Return rule in text format
+
+=cut
+
 sub write
 {
     my $self = shift;
@@ -43,6 +62,13 @@ sub write
             "\n".$self->write_action.
             '    } ';
 }
+
+=head2 write_condition
+
+ set require for used conditions
+ return conditions in text format
+
+=cut
 
 sub write_condition
 {
@@ -59,6 +85,13 @@ sub write_condition
     return $self->conditions->write();
 }
 
+=head2 write_action
+
+ set require for used actions
+ return actions in text format
+
+=cut
+
 sub write_action
 {
     my $self = shift;
@@ -67,7 +100,7 @@ sub write_action
     my $require = $self->require();
 
     foreach my $command ( @{$self->actions()} ) {
-            last if (!$command->command);
+            next if (! $command->command);
             $actions .= '    '.$command->command;
             $actions .= ' '.$command->param if ($command->param);
 			$actions .= ";\n";
@@ -79,6 +112,129 @@ sub write_action
     }
 	$self->require($require);
     return $actions;
+}
+
+=head2 swap_action
+
+ swap actions by order
+ return 1 on succes, 0 on failure
+
+=cut
+
+sub swap_actions
+{
+    my $self = shift;
+    my $swap1 = shift;
+    my $swap2 = shift;
+
+    return 0 if $swap1 == $swap2;
+    return 0 if (! defined $self->actions);
+    return 0 if $swap1 <= 0 || $swap2 <= 0;
+
+    my $pa1 = $self->find_action($swap1);
+    my $pa2 = $self->find_action($swap2);
+
+    return 0 if ref($pa1) ne 'NET::Sieve::Script::Action';
+    return 0 if ref($pa2) ne 'NET::Sieve::Script::Action';
+
+    my @Actions = @{$self->actions()};
+    my @NewActions = ();
+
+    my $i = 1 ;
+    foreach my $action (@{$self->actions()}) {
+        if ($i == $swap1 ) {
+            push @NewActions, $pa2;
+        }
+        elsif ($i == $swap2 ) {
+            push @NewActions, $pa1;
+        }
+        else {
+            push @NewActions, $action;
+        };  
+        $i++;
+    }
+    $self->actions(\@NewActions);
+
+    return 1;
+}
+
+=head2 find_action
+
+ find action by order
+ Returns:  NET::Sieve::Script::Action object, 0 on error
+
+=cut
+
+sub find_action
+{
+    my $self = shift;
+    my $order = shift;
+
+    return 0 if (! defined $self->actions);
+    my @Actions = @{$self->actions()};
+    my $i = 1;
+    foreach my $action (@Actions) {
+        return $action if ($i == $order);
+        $i++;
+    }
+
+    return 0;
+}
+
+=head2 delete_action
+
+delete action by order, first is 1;
+
+=cut
+
+sub delete_action
+{
+    my $self = shift;
+    my $order = shift;
+    my $deleted = 0;
+    my @NewActions;
+
+    return 0 if (! defined $self->actions);
+    my @Actions = @{$self->actions()};
+
+    my $i = 1;
+    foreach my $action (@Actions) {
+        if ($i == $order) {
+            $deleted = 1;
+        }
+        else {
+            push @NewActions, $action;
+            };
+        $i++;
+    };
+
+    $self->actions(\@NewActions);
+
+    return $deleted;
+}
+
+=head2 add_action
+
+ Purpose   : add action at end of block
+ Arguments : command line or NET::Sieve::Script::Action object
+ Return    : 1 on success
+
+=cut
+
+sub add_action
+{
+    my $self = shift;
+    my $action = shift;
+
+    my $pAction = (ref($action) eq 'NET::Sieve::Script::Action')?$action:NET::Sieve::Script::Action->new($action);
+
+    my @Actions = defined $self->actions?@{$self->actions()}:();
+
+    push @Actions, $pAction;
+
+    $self->actions(\@Actions);
+
+    return 1;
 }
 
 =head1 NAME

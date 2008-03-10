@@ -172,7 +172,6 @@ sub swap_rules
     my $self = shift;
     my $swap1 = shift;
     my $swap2 = shift;
-    my ($pr1,$pr2);
 
     return 0 if $swap1 == $swap2;
 
