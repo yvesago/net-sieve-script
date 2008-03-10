@@ -149,8 +149,26 @@ swap priority, take care of if/else/elsif
 sub swap_rules
 {
     my $self = shift;
-    my $new = shift;
-    my $old = shift;
+    my $swap1 = shift;
+    my $swap2 = shift;
+    my ($pr1,$pr2);
+
+    return 0 if $swap1 == $swap2;
+    return 0 if $swap1<=0 || $swap2<=0;
+    return 0 if not  defined $self->rules;
+    return 0 if $swap1 > $self->max_priority || $swap2 > $self->max_priority;
+
+
+    foreach my $rule (@{$self->rules}) {
+        $pr2 = $rule if ($rule->priority == $swap1 );
+        $pr1 = $rule if ($rule->priority == $swap2 );
+    }
+    
+    my $mem_pr2 = $pr2->priority();
+    $pr2->priority($pr1->priority());
+    $pr1->priority($mem_pr2);
+
+    return 1;
 }
 
 =head2 delete_rule

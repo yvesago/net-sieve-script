@@ -1,4 +1,4 @@
-use Test::More tests => 26;
+use Test::More tests => 32;
 use strict;
 
 use lib qw(lib);
@@ -21,11 +21,18 @@ for my $i (1..3) {
     ok ($script->add_rule($Rules[$i]), "add rule $i");
    }
 
+ok ($script->swap_rules(3,2),"swap rules 3,2");
+is ($script->swap_rules(4,2),0,"test error on swap rules");
+is ($script->swap_rules(3,0),0,"test error on swap rules");
+is ($script->swap_rules(3,3),0,"test error on swap rules");
+
+is ($script->delete_rule(5),0,"test error on delete rule");
 ok ($script->delete_rule(2),"delete rule 2");
 ok ($script->delete_rule(1),"delete rule 1");
 ok ($script->delete_rule(1),"delete rule 1");
 is ($script->max_priority,0, "no more rules");
 
+is ($script->add_rule(5),0,"test error on add rule");
 for my $i (1..6) {
     my $ctrl = 'if' ;
    $ctrl = 'else' if $i == 5;
