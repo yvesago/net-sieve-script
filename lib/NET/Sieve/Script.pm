@@ -67,7 +67,7 @@ sub write_rules {
     my $text;
 	my %require = ();
 
-    foreach my $rule ( sort { $a->priority <=> $b->priority } @{$self->rules()} ) {
+    foreach my $rule ( sort { $a->priority() <=> $b->priority() } @{$self->rules()} ) {
       $text .= $rule->write."\n";
 	  foreach my $req ($rule->require()) {
 	      $require{$req->[0]} = 1;
@@ -87,7 +87,9 @@ sub write_rules {
 
 	$self->require($require_line);
 
-    return "require $require_line;\n".$text;
+    $require_line = "require $require_line;\n" if $require_line;
+
+    return $require_line.$text;
 }
 
 =head2 read_rules
@@ -153,11 +155,14 @@ sub swap_rules
 
 =head2 delete_rule
 
-delete rule take care for 'if' test
+ delete rule and change priority
+ delete rule take care for 'if' test
 
  if deleted is 'if'
   delete next if next is 'else'
   change next in 'if' next is 'elsif'
+
+ Returns : 1 on success, 0 on error
 
 =cut
 
@@ -165,7 +170,65 @@ sub delete_rule
 {
     my $self = shift;
     my $id = shift;
+    my $deleted = 0;
+    my @Rules =  defined $self->rules?@{$self->rules}:();
+    my @NewRules = ();
+    my $order = 0;
+    
+    for ( my $i = 0; $i < scalar(@Rules); $i++ ) {
+        my $rule = $Rules[$i];
+        my $next=$i+1;
+        if ($rule->priority == $id) {
+            $deleted = 1;
+            if ( defined $Rules[$next] && $rule->alternate eq 'if') {
+                $Rules[$next]->alternate('if') 
+                    if ($Rules[$next]->alternate eq 'elsif' );
 
+                if ($Rules[$next]->alternate eq 'else' ) {
+                    $i++;
+                    $rule = $Rules[$i];
+                }
+            }
+        }
+        else {
+            ++$order;
+            $rule->priority($order);
+            push @NewRules, $rule;
+        }
+    }
+
+    $self->max_priority($order);
+    $self->rules(\@NewRules);
+    
+    return $deleted;
+}
+
+=head2 add_rule
+
+ Purpose  : add a rule in end of script
+ Returns  : priority on success, 0 on error
+ Argument : NET::Sieve::Script::Rule object
+
+=cut
+
+sub add_rule
+{
+    my $self = shift;
+    my $rule = shift;
+
+    return 0 if ref($rule) ne 'NET::Sieve::Script::Rule';
+
+    my $order = $self->max_priority();
+    my @Rules =  defined $self->rules?@{$self->rules}:();
+
+    ++$order;
+    $rule->priority($order);
+    push @Rules, $rule;
+
+    $self->max_priority($order);
+    $self->rules(\@Rules);
+
+    return $order;
 }
 
 # private function _strip

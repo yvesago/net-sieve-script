@@ -10,7 +10,8 @@ my $command = ' fileinto "INBOX.spam" ';
 # test case on keywords
 my $rule = NET::Sieve::Script::Rule->new(
     ctrl => 'iF',
-    block => 'Fileinto "spam"; stop;',
+    block => 'Fileinto "spam"; 
+    stop;',
     test_list => 'anYof (NOT Address :aLl :contains ["To", "Cc", "Bcc"] "me@example.com", 
                         heaDer :Matches "subject" ["*make*money*fast*", "*university*dipl*mas*"])',
     order => 1
