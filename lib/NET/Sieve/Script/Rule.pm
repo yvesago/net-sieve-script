@@ -12,7 +12,7 @@ sub new
 
     my $self = bless ({}, ref ($class) || $class);
 
-    $self->alternate(lc($param{ctrl})) if $param{ctrl};
+    $self->alternate(lc($param{ctrl})||'if');
     $self->priority($param{order}) if $param{order};
 
     if ($param{block}) {

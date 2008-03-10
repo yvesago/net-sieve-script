@@ -4,10 +4,13 @@ TODO list for Perl module NET::Sieve::Script
 - _trim method
 * _strip method
 * :over
-- swap rules
-- delete rule
-- add rule
+* swap rules
+* delete rule
+* add rule
+* find rule
+- add/find/swap/del actions
+- add/find/swap/del conditions
 - chg alternate on order
-- vrfy RFC for match/case order
+* vrfy RFC for match/case order
 - more tests case
 - manage comment rules

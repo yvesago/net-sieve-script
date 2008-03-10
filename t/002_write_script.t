@@ -1,4 +1,4 @@
-use Test::More tests => 32;
+use Test::More tests => 33;
 use strict;
 
 use lib qw(lib);
@@ -14,17 +14,20 @@ my $script = NET::Sieve::Script->new();
 my @Rules = ();
 for my $i (1..3) {
     $Rules[$i] = NET::Sieve::Script::Rule->new(
-        ctrl => 'if',
-        block => 'fileinto "Test'.$i.'"; stop;',
-        test_list => 'header :contains "Subject" "[Test'.$i.']"' 
+        test_list => 'header :contains "Subject" "[Test'.$i.']"' ,
+        block => 'fileinto "Test'.$i.'"; stop;'
         );
     ok ($script->add_rule($Rules[$i]), "add rule $i");
-   }
+}
+
+#print $script->write_rules;
+isa_ok($script->find_rule(2),'NET::Sieve::Script::Rule');
 
 ok ($script->swap_rules(3,2),"swap rules 3,2");
 is ($script->swap_rules(4,2),0,"test error on swap rules");
 is ($script->swap_rules(3,0),0,"test error on swap rules");
 is ($script->swap_rules(3,3),0,"test error on swap rules");
+
 
 is ($script->delete_rule(5),0,"test error on delete rule");
 ok ($script->delete_rule(2),"delete rule 2");
@@ -33,6 +36,8 @@ ok ($script->delete_rule(1),"delete rule 1");
 is ($script->max_priority,0, "no more rules");
 
 is ($script->add_rule(5),0,"test error on add rule");
+
+# register 6 rules with else, elsif
 for my $i (1..6) {
     my $ctrl = 'if' ;
    $ctrl = 'else' if $i == 5;
@@ -51,7 +56,7 @@ is ($script->max_priority,4,"4 rules");
 ok ($script->delete_rule(2),"delete rule 2 and 3, rule 'if' with 'else' ");
 is ($script->max_priority,2,"2 rules");
 
-
+# add else rule
 my $else_rule = NET::Sieve::Script::Rule->new(
     ctrl => 'else',
     block => 'reject; stop;'

@@ -140,9 +140,30 @@ sub read_rules
     return 1;
 }
 
+=head2 find_rule
+
+return NET::Sieve::Script::Rule pointer find by priority
+return 0 on error, 1 on not find
+
+=cut
+
+sub find_rule
+{
+    my $self = shift;
+    my $priority = shift;
+    return 0 if $priority > $self->max_priority || $priority <= 0;
+    return 0 if not  defined $self->rules;
+
+    foreach my $rule (@{$self->rules}) {
+        return $rule if ($rule->priority == $priority );
+    }
+
+    return 1;
+}
+
 =head2 swap_rules
 
-swap priority, take care of if/else/elsif
+swap priority, don't take care of if/else/elsif
 
 =cut
 
@@ -154,16 +175,13 @@ sub swap_rules
     my ($pr1,$pr2);
 
     return 0 if $swap1 == $swap2;
-    return 0 if $swap1<=0 || $swap2<=0;
-    return 0 if not  defined $self->rules;
-    return 0 if $swap1 > $self->max_priority || $swap2 > $self->max_priority;
 
-
-    foreach my $rule (@{$self->rules}) {
-        $pr2 = $rule if ($rule->priority == $swap1 );
-        $pr1 = $rule if ($rule->priority == $swap2 );
-    }
+    my $pr1 = $self->find_rule($swap1);
+    my $pr2 = $self->find_rule($swap2);
     
+    return 0 if ref($pr1) ne 'NET::Sieve::Script::Rule';
+    return 0 if ref($pr2) ne 'NET::Sieve::Script::Rule';
+
     my $mem_pr2 = $pr2->priority();
     $pr2->priority($pr1->priority());
     $pr1->priority($mem_pr2);
