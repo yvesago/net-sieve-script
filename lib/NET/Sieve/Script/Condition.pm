@@ -49,7 +49,7 @@ sub new
     # better :  1 while ($args =~ s/(\[[^\]]+?)",\s*/$1" /);
     $args =~ s/",\s?"/" "/g;
 
-    # recursiv search for more condtions
+    # recursiv search for more conditions
     if ( $args =~ m/^\((.*)\)$/ ) { 
         my @condition_list;
         my @condition_list_string = split ( ',', $1 );
@@ -171,6 +171,15 @@ sub _write_test {
     1 while ( $line =~ s/(\[[^\]]+?)" "/$1", "/);
 
     return $line;
+}
+
+=head2  add_subcondition
+
+=cut
+
+sub add_subcondition
+{
+    my $self = shift;
 }
 
 
