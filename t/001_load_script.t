@@ -47,7 +47,7 @@ if allof (header :regex :comparator "i;ascii-casemap" "Subject" "^Output file li
   fileinto "Backup listings";
   stop;
 }
-if header :is "Subject" "Daily virus scan reminder"
+if Header :is "Subject" "Daily virus scan reminder"
 {
   discard;
   stop;
@@ -123,7 +123,7 @@ is( $object->require,'["fileinto","reject","vacation","imapflags","relational","
 
 my $res_script = $object->write_rules;
 is ( $object->require, '["fileinto", "regex"]', "new require for script2");
-is ($object->_strip($test_script2),$object->_strip($res_script), "parse script2 (no raw)");
+is (lc($object->_strip($test_script2)),lc($object->_strip($res_script)), "parse script2 ( no raw, test case in keywords )");
 
 #print $object->write_rules;
 

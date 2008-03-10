@@ -7,7 +7,7 @@ BEGIN { use_ok( 'NET::Sieve::Script::Rule' ); }
 
 my $command = ' fileinto "INBOX.spam" ';
 
-# test case
+# test case on keywords
 my $rule = NET::Sieve::Script::Rule->new(
     ctrl => 'iF',
     block => 'Fileinto "spam"; stop;',
