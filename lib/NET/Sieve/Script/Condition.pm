@@ -25,21 +25,24 @@ sub new
 
     my @header_list = qw(From To Cc Bcc Sender Resent-From Resent-To List-Id);
 
-    $param =~ s/^ +//;
-    $param =~ s/ +$//;
+    $param =~ s/^\s+//;
+    $param =~ s/\s+$//;
+    $param =~ s/\t/ /g;
+    $param =~ s/\s+/ /g;
+    $param =~ s/[\r\n]//gs;
 
     return undef if 
         $param !~ m/^(not )?(address|enveloppe|header|size|allof|anyof|exists|false|true)(.*)/i;
 
-    my $not = $1;
-    my $test = $2;
+    my $not = lc($1);
+    my $test = lc($2);
     my $args = $3;
 
     $self->not($not);
     $self->test($test);
 
-    $args =~ s/^\s+//;
-    $args =~ s/\s+$//;
+    $args =~ s/^\s+//g;
+    $args =~ s/\s+$//g;
 
     # substitute ',' separator by ' ' in string-list
     # to easy parse test-list
@@ -60,12 +63,12 @@ sub new
     # RFC Syntax : address [ADDRESS-PART] [COMPARATOR] [MATCH-TYPE]
     #             <header-list: string-list> <key-list: string-list>
     if ( $test eq 'address' ) {
-      ($address,$comparator,$match,$string,$key_list) = $args =~ m/@ADDRESS_PART?(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/;
+      ($address,$comparator,$match,$string,$key_list) = $args =~ m/@ADDRESS_PART?(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/gi;
     };
     # RFC Syntax : envelope [COMPARATOR] [ADDRESS-PART] [MATCH-TYPE]
     #             <envelope-part: string-list> <key-list: string-list>
     if ( $test eq 'envelope' ) {
-      ($comparator,$address,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@ADDRESS_PART?@MATCH_TYPE?@LISTS @LISTS$/;
+      ($comparator,$address,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@ADDRESS_PART?@MATCH_TYPE?@LISTS @LISTS$/gi;
     };
     # RFC Syntax : header [COMPARATOR] [MATCH-TYPE]
     #             <header-names: string-list> <key-list: string-list>
@@ -82,15 +85,15 @@ sub new
       ($match,$string) = $args =~ m/@MATCH_SIZE(.*)$/gi;
 	};
     # find require
-    if ($match eq ':regex ') {
+    if (lc($match) eq ':regex ') {
 	  push @{$require}, 'regex';
 	};
 	$self->require($require);
 
 
-    $self->address_part($address);
-    $self->match_type($match);
-    $self->comparator($comparator);
+    $self->address_part(lc($address));
+    $self->match_type(lc($match));
+    $self->comparator(lc($comparator));
     $self->header_list($string);
     $self->key_list($key_list);
 

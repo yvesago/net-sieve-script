@@ -14,8 +14,8 @@ sub new
 
     my ($command, $param) = $init =~ m/(keep|discard|redirect|stop|reject|fileinto)@MATCH?/sgi;
 
-    $self->command($command);
-    $self->param($param);
+    $self->command(lc($command)) if $command;
+    $self->param($param) if $param ;
 
     return $self;
 }

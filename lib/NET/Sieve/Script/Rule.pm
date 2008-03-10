@@ -12,18 +12,22 @@ sub new
 
     my $self = bless ({}, ref ($class) || $class);
 
-        $self->alternate($param{ctrl});
-        $self->priority($param{order});
+    $self->alternate(lc($param{ctrl})) if $param{ctrl};
+    $self->priority($param{order}) if $param{order};
 
+    if ($param{block}) {
         my @Actions;
         my @commands = split( ';' , $param{block});
         foreach my $command (@commands) {
             push @Actions, NET::Sieve::Script::Action->new($command);
         };  
         $self->actions(\@Actions);
+    }
 
+    if ($param{test_list}) {
         my $cond = NET::Sieve::Script::Condition->new($param{test_list});
         $self->conditions($cond);
+    }
 
 
     return $self;

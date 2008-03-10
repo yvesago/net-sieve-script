@@ -45,9 +45,11 @@ sub new
     my $self = bless ({}, ref ($class) || $class);
     my @LISTS = qw((\[.*?\]|".*?"));
 
-    $self->raw($param);
-    $self->require($1) if ( $param =~ m/require @LISTS;/si );
-    $self->read_rules();
+    if ($param) {
+        $self->raw($param); 
+        $self->require($1) if ( $param =~ m/require @LISTS;/si );
+        $self->read_rules();
+    }
 
     return $self;
 }
