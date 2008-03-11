@@ -4,6 +4,8 @@ use base qw(Class::Accessor::Fast);
 
 __PACKAGE__->mk_accessors(qw(test not condition key_list header_list address_part match_type comparator require));
 
+my @FILO;
+
 sub new
 {
     my ($class, $param) = @_;
@@ -23,13 +25,13 @@ sub new
     # match : <header-list: string-list> <key-list: string-list>
     my @LISTS = qw((\[.*?\]|".*?"));
 
-    my @header_list = qw(From To Cc Bcc Sender Resent-From Resent-To List-Id);
+    #my @header_list = qw(From To Cc Bcc Sender Resent-From Resent-To List-Id);
 
     $param =~ s/^\s+//;
     $param =~ s/\s+$//;
     $param =~ s/\t/ /g;
     $param =~ s/\s+/ /g;
-    #$param =~ s/[\r\n]//gs;
+    $param =~ s/[\r\n]//gs;
 
     return undef if 
         $param !~ m/^(not )?(address|enveloppe|header|size|allof|anyof|exists|false|true)(.*)/i;
@@ -43,25 +45,37 @@ sub new
 
     $args =~ s/^\s+//g;
     $args =~ s/\s+$//g;
+    $args =~ s/\s+([\(\)])\s+/$1/g;
 
     # substitute ',' separator by ' ' in string-list
     # to easy parse test-list
     # better :  
-    #1 while ($args =~ s/(\[[^\]]+?)",\s*/$1" /);
-    $args =~ s/",\s?"/" "/g;
+    1 while ($args =~ s/(\[[^\]]+?)",\s*/$1" /);
+    #$args =~ s/",\s+"/" "/g;
 
-    #TODO better recursiv search for more conditions
-    # now match only one level
-    while ( $args =~ m/\((.*?)\)/gs ) { 
-    #while ( $args =~ m/\([^\)](.*?)\)/gs ) { 
+    #recursiv search for anyof/allof conditions
+    my @COND = $self->condition(); 
+    while ( $args =~ s/(.*)\(([^\(].*?)\)(.*)/$1$3/s ) { 
+        my $first = $1;
+        my $last = $3;
+        my $subs = $2;
+
         my @condition_list;
-        #print "++ $1 ++\n";
-        my @condition_list_string = split ( ',', $1 );
+        my @condition_list_string = split ( ',', $subs );
         foreach my $sub_condition (@condition_list_string) {
-            push @condition_list, NET::Sieve::Script::Condition->new($sub_condition);
+            my $new_subs = NET::Sieve::Script::Condition->new($sub_condition);
+            next if (!$new_subs);
+            if ( $new_subs->test eq 'anyof' || $new_subs->test eq 'allof' ) {
+                $new_subs->condition(pop @FILO);
+            };
+            (!$first && !$last) ? 
+               push @COND, $new_subs : push @condition_list, $new_subs;
         }
-        $self->condition(\@condition_list);
-    }
+    
+        (!$first && !$last) ? 
+            $self->condition(\@COND) : push @FILO, \@condition_list;
+
+    };
 
     my ($address,$comparator,$match,$string,$key_list);
     # RFC Syntax : address [ADDRESS-PART] [COMPARATOR] [MATCH-TYPE]
@@ -123,8 +137,11 @@ sub write {
         $text_condition .= $self->not.' ' if ($self->not);
         $text_condition .= $self->test." ( ";
         foreach my $sub_cond ( @{$self->condition()} ) {
-            $sub_cond->write($recursiv_level) if (defined $sub_cond->condition() );
-            $text_condition .= "\n".(' ' x $recursiv_level).'  '.$sub_cond->_write_test().','
+            next if ! $sub_cond;
+            if (defined $sub_cond->condition() ) {
+                $text_condition .= "\n".(' ' x $recursiv_level).$sub_cond->write($recursiv_level).",\n";
+                next;};
+            $text_condition .= "\n".(' ' x $recursiv_level).'  '.  $sub_cond->_write_test().',';
         }
         $text_condition =~ s/,$//;
         $text_condition .= ' )';
@@ -165,7 +182,6 @@ sub _write_test {
 	};
 	
 
-    #$line.=' '.$self->match_type.' '.$self->header_list.' '.$self->key_list;
     $line.=' '.$self->header_list.' '.$self->key_list;
 
     $line =~ s/^\s+//;
