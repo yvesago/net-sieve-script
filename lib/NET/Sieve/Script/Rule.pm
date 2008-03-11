@@ -114,7 +114,41 @@ sub write_action
     return $actions;
 }
 
+=head2 delete_condition
+
+ Purpose   : delete condition by rule, delete all block on delete anyof/allof
+ Arguments : condition id
+ Returns   : 1 on success, 0 on error
+
+=cut
+
+sub delete_condition
+{
+    my $self = shift;
+    my $id = shift;
+
+    my $cond_to_delete =  $self->conditions->AllConds->{$id};
+    return 0 if (! defined $cond_to_delete);
+
+    if (! defined $cond_to_delete->parent) {
+        $self->conditions(undef);
+        return 1;
+    }
+    my @parent_conditions = @{$cond_to_delete->parent->condition()};
+    my @new_conditions = ();
+    foreach my $cond (@parent_conditions) {
+        push @new_conditions, $cond if ( $cond->id != $id );
+    }
+    $cond_to_delete->parent->condition(\@new_conditions);
+
+    return 1;
+}
+
 =head2 add_condition
+
+ Purpose   : add condition to rule, add 'anyof' group on second rule
+ Arguments : string or Condition object
+ Returns   : new condition id or 0 on error
 
 =cut
 
@@ -122,22 +156,35 @@ sub add_condition
 {
     my $self = shift;
     my $cond = shift;
+    my $parent_id = shift;
     $cond = ref($cond) eq 'NET::Sieve::Script::Condition' ? $cond : NET::Sieve::Script::Condition->new($cond);
 
+    if ($parent_id) {
+        # add new condition to anyof/allof parent block
+        my $parent = $self->conditions->AllConds->{$parent_id};
+        return 0 if (!$parent || ( $parent->test ne 'allof' && $parent->test ne 'anyof') );
+        my @conditions_list = (defined $parent->condition())?@{$parent->condition()}:();
+        $cond->parent($parent);
+        push @conditions_list, $cond;
+        $parent->condition(\@conditions_list);
+        return 1;
+    }
+
     if ( defined $self->conditions() ) {
-        print $self->conditions->test."----\n";
         if ( $self->conditions->test eq 'anyof' 
                || $self->conditions->test eq 'allof' ) {
-            $cond->parent($self);
+            # add condition on first block
             my @conditions_list = @{$self->conditions->condition()};
+            $cond->parent($self->conditions);
             push @conditions_list, $cond;
-             $self->conditions->condition(\@conditions_list);
+            $self->conditions->condition(\@conditions_list);
         }
         else {
-            my $new_anyoff = NET::Sieve::Script::Condition->new('anyoff');
+            # add a new block on second add
+            my $new_anyoff = NET::Sieve::Script::Condition->new('anyof');
             my @conditions_list = ();
-            $self->conditions->parent($new_anyoff);
             $cond->parent($new_anyoff);
+            $self->conditions->parent($new_anyoff);
             push @conditions_list, $self->conditions;
             push @conditions_list, $cond;
             $new_anyoff->condition(\@conditions_list);
@@ -145,6 +192,7 @@ sub add_condition
         }
     } 
     else {
+        # add first condition
         $self->conditions($cond);
     }
 

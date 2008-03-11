@@ -9,7 +9,7 @@ TODO list for Perl module NET::Sieve::Script
 * add rule
 * find rule
 * add/find/swap/del actions
-- add/find/swap/del conditions
+* add/del conditions : swap is useless, find can use AllConds
 - chg alternate on order
 * vrfy RFC for match/case order
 - more tests case
