@@ -2,9 +2,11 @@ package NET::Sieve::Script::Condition;
 use strict;
 use base qw(Class::Accessor::Fast);
 
-__PACKAGE__->mk_accessors(qw(test not condition key_list header_list address_part match_type comparator require));
+__PACKAGE__->mk_accessors(qw(test not id condition parent AllConds key_list header_list address_part match_type comparator require));
 
 my @FILO;
+my $ids = 0;
+my %Conditions;
 
 sub new
 {
@@ -27,10 +29,10 @@ sub new
 
     #my @header_list = qw(From To Cc Bcc Sender Resent-From Resent-To List-Id);
 
-    $param =~ s/^\s+//;
-    $param =~ s/\s+$//;
     $param =~ s/\t/ /g;
     $param =~ s/\s+/ /g;
+    $param =~ s/^\s+//;
+    $param =~ s/\s+$//;
     $param =~ s/[\r\n]//gs;
 
     return undef if 
@@ -43,9 +45,16 @@ sub new
     $self->not($not);
     $self->test($test);
 
+    # to manage tree access
+    $ids++;
+    $self->id($ids);
+    $Conditions{$ids} = $self;
+    $self->AllConds(\%Conditions);
+
+    # clean args
     $args =~ s/^\s+//g;
     $args =~ s/\s+$//g;
-    $args =~ s/\s+([\(\)])\s+/$1/g;
+    $args =~ s/\s+(\s+[\(\)],?\s+)\s+/$1/g;
 
     # substitute ',' separator by ' ' in string-list
     # to easy parse test-list
@@ -66,7 +75,12 @@ sub new
             my $new_subs = NET::Sieve::Script::Condition->new($sub_condition);
             next if (!$new_subs);
             if ( $new_subs->test eq 'anyof' || $new_subs->test eq 'allof' ) {
-                $new_subs->condition(pop @FILO);
+                my $child_tab = pop @FILO;
+                $new_subs->condition($child_tab);
+                # set parent infos for tree management
+                foreach my $child ( @{$child_tab} ) {
+                    $child->parent($new_subs);
+                }
             };
             (!$first && !$last) ? 
                push @COND, $new_subs : push @condition_list, $new_subs;
@@ -76,6 +90,10 @@ sub new
             $self->condition(\@COND) : push @FILO, \@condition_list;
 
     };
+    # set parent infos for tree management
+    foreach my $child ( @COND ) {
+        $child->parent($self) if $child;
+    } ;
 
     my ($address,$comparator,$match,$string,$key_list);
     # RFC Syntax : address [ADDRESS-PART] [COMPARATOR] [MATCH-TYPE]

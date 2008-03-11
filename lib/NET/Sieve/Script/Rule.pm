@@ -114,6 +114,43 @@ sub write_action
     return $actions;
 }
 
+=head2 add_condition
+
+=cut
+
+sub add_condition
+{
+    my $self = shift;
+    my $cond = shift;
+    $cond = ref($cond) eq 'NET::Sieve::Script::Condition' ? $cond : NET::Sieve::Script::Condition->new($cond);
+
+    if ( defined $self->conditions() ) {
+        print $self->conditions->test."----\n";
+        if ( $self->conditions->test eq 'anyof' 
+               || $self->conditions->test eq 'allof' ) {
+            $cond->parent($self);
+            my @conditions_list = @{$self->conditions->condition()};
+            push @conditions_list, $cond;
+             $self->conditions->condition(\@conditions_list);
+        }
+        else {
+            my $new_anyoff = NET::Sieve::Script::Condition->new('anyoff');
+            my @conditions_list = ();
+            $self->conditions->parent($new_anyoff);
+            $cond->parent($new_anyoff);
+            push @conditions_list, $self->conditions;
+            push @conditions_list, $cond;
+            $new_anyoff->condition(\@conditions_list);
+            $self->conditions($new_anyoff);
+        }
+    } 
+    else {
+        $self->conditions($cond);
+    }
+
+    return $cond->id;
+}
+
 =head2 swap_action
 
  swap actions by order
