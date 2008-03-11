@@ -125,6 +125,17 @@ my $res_script = $object->write_rules;
 is ( $object->require, '["fileinto", "regex"]', "new require for script2");
 is (lc($object->_strip($test_script2)),lc($object->_strip($res_script)), "parse script2 ( no raw, test case in keywords )");
 
+#open F, "t/loud.txt";
+#my @test_loud = <F>;
+#close F;
+
+#print @test_loud;
+
+#$object->raw(join "\n",@test_loud);
+#$object->read_rules();
+#print $object->write_rules;
+#is ($object->_strip,$object->_strip($object->write_rules), "parse raw script3");
+
 #print $object->write_rules;
 
 #TODO test $object->swap_rules(1,5);

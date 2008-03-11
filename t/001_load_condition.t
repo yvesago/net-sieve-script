@@ -2,7 +2,7 @@
 
 # t/001_load.t - check module loading and create testing directory
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 use strict;
 
 use lib qw(lib);
@@ -13,6 +13,7 @@ my $bad_string = 'header :contains :comparator "i;octet" "i;octet" "Subject" "MA
 isnt (NET::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string not RFC 5228');
 
 my @strings = (
+'header :value "ge" :comparator "i;ascii-numeric" ["X-Spam-score"] ["14"]',
 'header :comparator "i;octet" :contains "Subject" "MAKE MONEY FAST"',
 'header :contains "x-attached" [".exe",".bat",".js"]',
 'not address :localpart :is "X-Delivered-To" ["address1", "address2", "address3"]',

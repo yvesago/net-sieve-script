@@ -21,7 +21,7 @@ sub new
     my @MATCH_TYPE = qw((:is |:contains |:matches ));
     my @MATCH_SIZE = qw((:over |:under ));
     # match relationnal RFC 5231
-	my @MATCH_REL = qw((:value ".." |:count ".." ));
+	my @MATCH_REL = qw((:value .*? |:count .*? ));
     # match : <header-list: string-list> <key-list: string-list>
     my @LISTS = qw((\[.*?\]|".*?"));
 
@@ -93,10 +93,17 @@ sub new
     if ( $test eq 'header' ) {
       # only for regex old draft
       ($match,$comparator,$string,$key_list) = $args =~ m/(:regex )?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
+      # match relationnal RFC 5231
+	  if (!$match) {
+        ($match,$comparator,$string,$key_list) = $args =~ m/@MATCH_REL?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
+	  };
       # RFC 5228 ! 
 	  if (!$match) {
         ($comparator,$match,$string,$key_list) = $args =~ m/(:comparator "(?:@COMPARATOR_NAME)" )?@MATCH_TYPE?@LISTS @LISTS$/gi;
-	  };
+      }
+	  if (!$match) {
+        ($match,$comparator,$string,$key_list) = $args =~ m/@MATCH_TYPE?(:comparator "(?:@COMPARATOR_NAME)" )?@LISTS @LISTS$/gi;
+      }
     };
     # RFC Syntax : size <":over" / ":under"> <limit: number>
     if ( $test eq 'size'  ) {

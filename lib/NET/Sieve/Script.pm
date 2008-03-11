@@ -283,11 +283,12 @@ sub _strip {
     $script_raw =~ s/\s+\)/\)/g; # remove white-space before )
     $script_raw =~ s/\[\s+/\[/g; #  remove white-space after [ 
     $script_raw =~ s/\s+\]/\]/g; # remove white-space before ]
+    $script_raw =~ s/\]\s+,/\],/g; # remove white-space before ]
     $script_raw =~ s/^\s+//;
     $script_raw =~ s/\s+$//;
     $script_raw =~ s/","/", "/g;
 #TODO: to remove write_rules will set require
-    #$script_raw =~ s/require.*?["\]];\s+//sgi; #remove require
+    $script_raw =~ s/require.*?["\]];\s+//sgi; #remove require
 
 	return $script_raw;
 }
