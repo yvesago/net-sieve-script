@@ -20,7 +20,7 @@ for my $i (1..3) {
     ok ($script->add_rule($Rules[$i]), "add rule $i");
 }
 
-#print $script->write_rules;
+#print $script->write_script;
 isa_ok($script->find_rule(2),'NET::Sieve::Script::Rule');
 
 ok ($script->swap_rules(3,2),"swap rules 3,2");
@@ -88,7 +88,7 @@ if header :contains "Subject" "Re: Test2"
     stop;
     }';
 
-is( _strip($script2->write_rules), _strip($res_oo), "good oo style write");
+is( _strip($script2->write_script), _strip($res_oo), "good oo style write");
 
 my $script3 = NET::Sieve::Script->new();
 my $rule3 =  NET::Sieve::Script::Rule->new();
@@ -96,10 +96,10 @@ $rule3->alternate('vacation');
 $actions = 'vacation "I\'m out -- send mail to cyrus-bugs"';
 $rule3->add_action($actions);
 $script3->add_rule($rule3);
-is ( _strip($script3->write_rules), _strip('require "vacation";
+is ( _strip($script3->write_script), _strip('require "vacation";
     vacation "I\'m out -- send mail to cyrus-bugs";'), "write simple vacation");
 
 #print "======\n";
 #print $Rules[3]->write."\n";
 #print "======\n";
-#print $script3->write_rules;
+#print $script3->write_script;

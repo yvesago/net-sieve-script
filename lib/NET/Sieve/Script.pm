@@ -1,8 +1,6 @@
 package NET::Sieve::Script;
 use strict;
 
-# http://www.ietf.org/rfc/rfc3028.txt
-
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -54,7 +52,20 @@ sub new
     return $self;
 }
 
-=head2 write_rules
+=head2 parsing_ok
+
+return 1 if parsing of raw is ok
+
+=cut
+
+sub parsing_ok
+{
+    my $self = shift;
+
+    return ( $self->_strip eq _strip($self->write_script) );
+}
+
+=head2 write_script
 
  Purpose : write script, ie require and rules 
  Return  : set current require
@@ -62,7 +73,7 @@ sub new
 
 =cut
 
-sub write_rules {
+sub write_script {
     my $self = shift;
     my $text;
 	my %require = ();
@@ -74,7 +85,7 @@ sub write_rules {
 	  }
     }
 
-#TODO keep original require if current if include for test parsing
+#TODO keep original require if current is include, for test parsing
     my $require_line;
     my $count;
     foreach my $req (sort keys %require) {
@@ -271,10 +282,12 @@ sub add_rule
     return $order;
 }
 
-# private function _strip
+# private en exported tool _strip
 #  strip a string or strip raw
 #  return a string
 # usefull for parsing or test
+#
+# default remove require line or set $keep_require
 
 sub _strip {
     my ( $self, $script_raw, $keep_require ) = @_;
@@ -283,7 +296,6 @@ sub _strip {
         $script_raw = $self->raw() if (! $script_raw );
     } else {
         $script_raw = $self;
-        $keep_require = $script_raw;
     }
 
     $script_raw =~ s/\#.*//g;      # hash-comment
@@ -298,7 +310,8 @@ sub _strip {
     $script_raw =~ s/^\s+//;
     $script_raw =~ s/\s+$//;
     $script_raw =~ s/","/", "/g;
-#TODO: to remove write_rules will set require
+    $script_raw =~ s/"\s+;/";/g;
+
     $script_raw =~ s/require.*?["\]];\s+//sgi if (!$keep_require); #remove require
 
 	return $script_raw;
@@ -324,7 +337,18 @@ NET::Sieve::Script - parse and write sieve scripts
 B<WARNING!!! This module is still in early alpha stage. It is recommended
 that you use it only for testing.>
 
-http://www.ietf.org/rfc/rfc3028.txt
+Support RFC 5228 - sieve base
+    RFC 5231 - relationnal
+    RFC 5230 - vacation
+    Draft regex
+
+missing 
+    5229 variables
+    5232 imapflags
+    5233 subadress
+    5235 spamtest
+    notify draft
+
 
 =head1 CONSTRUCTOR
 

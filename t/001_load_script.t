@@ -114,14 +114,14 @@ is ($object->raw, $test_script3, "set raw script3");
 #read rules from raw
 $object->read_rules();
 is( $object->require,'["fileinto", "reject"]',"match require in script3");
-is ($object->_strip,$object->_strip($object->write_rules), "parse raw script3");
+is ($object->_strip,$object->_strip($object->write_script), "parse raw script3");
 
 #set new rules without raw
 $object->read_rules($test_script2);
 
 is( $object->require,'["fileinto","reject","vacation","imapflags","relational","comparator-i;ascii-numeric","regex","notify"]',"match original require for script2");
 
-my $res_script = $object->write_rules;
+my $res_script = $object->write_script;
 is ( $object->require, '["fileinto", "regex"]', "new require for script2");
 is (lc($object->_strip($test_script2)),lc($object->_strip($res_script)), "parse script2 ( no raw, test case in keywords )");
 
@@ -133,10 +133,10 @@ is (lc($object->_strip($test_script2)),lc($object->_strip($res_script)), "parse 
 
 #$object->raw(join "\n",@test_loud);
 #$object->read_rules();
-#print $object->write_rules;
-#is ($object->_strip,$object->_strip($object->write_rules), "parse raw script3");
+#print $object->write_script;
+#is ($object->_strip,$object->_strip($object->write_script), "parse raw script3");
 
-#print $object->write_rules;
+#print $object->write_script;
 
 #TODO test $object->swap_rules(1,5);
 #TODO test $object->remove_rule(3);
