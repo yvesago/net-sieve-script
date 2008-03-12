@@ -64,10 +64,15 @@ sub new
 
     #recursiv search for anyof/allof conditions
     my @COND = $self->condition(); 
+	my $count;
     while ( $args =~ s/(.*)\(([^\(].*?)\)(.*)/$1$3/s ) { 
         my $first = $1;
         my $last = $3;
         my $subs = $2;
+
+        $count++;
+		die "50 test lists does not sound reasonable !"
+              if ( $count >= 50);
 
         my @condition_list;
         my @condition_list_string = split ( ',', $subs );

@@ -112,6 +112,10 @@ sub new
         $self->read_rules();
     }
 
+    # break if more than 50 rules
+    die "50 rules does not sound reasonable !" 
+            if  ( $self->max_priority() >= 50 );
+
     return $self;
 }
 
@@ -206,14 +210,16 @@ sub read_rules
 
         ++$order;
 
+        # break if more than 50 rules
+        die "50 rules does not sound reasonable !" 
+             if  ( $order >= 50 );
+
         my $pRule = NET::Sieve::Script::Rule->new (
             ctrl => $ctrl,
             test_list => $test_list,
             block => $block,
             order => $order
             );
-        
-		# TODO break if more than 50 rules
 
         push @Rules, $pRule;
     };
@@ -378,8 +384,7 @@ sub _strip {
     $script_raw =~ s/\(\s+/\(/g; #  remove white-space after ( 
     $script_raw =~ s/\s+\)/\)/g; # remove white-space before )
     $script_raw =~ s/\[\s+/\[/g; #  remove white-space after [ 
-    $script_raw =~ s/\s+\]/\]/g; # remove white-space before ]
-    $script_raw =~ s/\]\s+,/\],/g; # remove white-space before ]
+    $script_raw =~ s/\s+\]\s+/\]/g; # remove white-space before ]
     $script_raw =~ s/^\s+//;
     $script_raw =~ s/\s+$//;
     $script_raw =~ s/","/", "/g;
