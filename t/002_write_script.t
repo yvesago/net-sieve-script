@@ -1,4 +1,4 @@
-use Test::More tests => 33;
+use Test::More tests => 34;
 use strict;
 
 use lib qw(lib);
@@ -67,7 +67,30 @@ ok ($script->delete_rule(1),"delete rule 1");
 ok ($script->delete_rule(1),"delete rule 1 and 2, rule 'if' with 'else' ");
 is ($script->max_priority,0,"no more rule");
 
+
+my $script2 = NET::Sieve::Script->new();
+my $rule2 =  NET::Sieve::Script::Rule->new();
+my $cond = NET::Sieve::Script::Condition->new('header');
+$cond->match_type(':contains');
+$cond->header_list('"Subject"');
+$cond->key_list('"Re: Test2"');
+my $actions = 'fileinto "INBOX.test"; stop;';
+
+$rule2->add_condition($cond);
+$rule2->add_action($actions);
+
+$script2->add_rule($rule2);
+
+my $res_oo = 'require "fileinto";
+if header :contains "Subject" "Re: Test2"
+    {
+    fileinto "INBOX.test";
+    stop;
+    }';
+
+is( _strip($script2->write_rules), _strip($res_oo), "good oo style write");
+
 #print "======\n";
 #print $Rules[3]->write."\n";
 #print "======\n";
-#print $script->write_rules;
+#print $script2->write_rules;

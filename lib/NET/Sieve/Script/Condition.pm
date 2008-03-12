@@ -218,15 +218,6 @@ sub _write_test {
     return $line;
 }
 
-=head2  add_subcondition
-
-=cut
-
-sub add_subcondition
-{
-    my $self = shift;
-}
-
 
 =head1 NAME
 

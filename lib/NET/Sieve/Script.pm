@@ -9,8 +9,8 @@ BEGIN {
     $VERSION     = '0.01';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
-    @EXPORT      = qw();
-    @EXPORT_OK   = qw();
+    @EXPORT      = qw(_strip);
+    @EXPORT_OK   = qw(_strip);
     %EXPORT_TAGS = ();
 }
 
@@ -272,8 +272,14 @@ sub add_rule
 # usefull for parsing or test
 
 sub _strip {
-    my $self = shift;
-    my $script_raw = shift || $self->raw();
+    my ( $self, $script_raw, $keep_require ) = @_;
+
+    if ( ref($self) eq 'NET::Sieve::Script' ) {
+        $script_raw = $self->raw() if (! $script_raw );
+    } else {
+        $script_raw = $self;
+        $keep_require = $script_raw;
+    }
 
     $script_raw =~ s/\#.*//g;      # hash-comment
     $script_raw =~ s!/\*.*.\*/!!g; # bracket-comment
@@ -288,7 +294,7 @@ sub _strip {
     $script_raw =~ s/\s+$//;
     $script_raw =~ s/","/", "/g;
 #TODO: to remove write_rules will set require
-    $script_raw =~ s/require.*?["\]];\s+//sgi; #remove require
+    $script_raw =~ s/require.*?["\]];\s+//sgi if ($keep_require); #remove require
 
 	return $script_raw;
 }

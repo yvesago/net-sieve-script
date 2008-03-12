@@ -7,6 +7,8 @@ use strict;
 
 use lib qw(lib);
 
+use NET::Sieve::Script;
+
 BEGIN { use_ok( 'NET::Sieve::Script::Condition' ); }
 
 my $bad_string = 'header :contains :comparator "i;octet" "i;octet" "Subject" "MAKE MONEY FAST"';
@@ -60,26 +62,8 @@ allof (
 
 
 foreach my $string (@strings) {
-
-    $string =~ s/","/", "/g;
-    $string =~ s/\[\s+"/\["/g;
-    $string =~ s/\(\s+/\(/g;
-    $string =~ s/"\s+]/"\]/g;
-    $string =~ s/\s+\)/\)/g;
-    $string =~ s/\s+/ /g;
-    $string =~ s/[\n\r]//g;
-
     my $cond = NET::Sieve::Script::Condition->new($string);
-    my $resp = $cond->write;
-
-    $resp =~ s/\(\s+/\(/g;
-    $resp =~ s/\s+\)/\)/g;
-    $resp =~ s/[\n\r]//g;
-    $resp =~ s/\s+/ /g;
-    $resp =~ s/^\s+//;
-    $resp =~ s/\s+$//;
-
-    is ($resp,$string,'test string');
+    is (_strip($cond->write),_strip($string),'test string');
 };
 
 

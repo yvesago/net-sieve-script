@@ -1,4 +1,4 @@
-use Test::More tests => 16;
+use Test::More tests => 17;
 use strict;
 
 use lib qw(lib);
@@ -39,6 +39,8 @@ is($rule->swap_actions(1,1), 0, "test swap_actions error");
 is($rule->swap_actions(1,0), 0, "test swap_actions error");
 is($rule->swap_actions(5,1), 0, "test swap_actions error");
 
+$rule->add_action("keep; stop;");
+isa_ok($rule->find_action(5),'NET::Sieve::Script::Action',"add list command 4 and 5, 5");
 #print $rule->write_action;
 
 

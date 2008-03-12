@@ -13,7 +13,7 @@ __PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
     Arguments :
         order =>     : optionnal set priority for rule
         ctrl  =>     : optionnal default 'if', else could be 'else' or 'elsif'
-        test_list => : optionnal conditions
+        test_list => : optionnal conditions by string or by Condition Object
         block =>     : optionnal block of commands
     Returns   :   NET::Sieve::Script::Rule object
 
@@ -38,7 +38,9 @@ sub new
     }
 
     if ($param{test_list}) {
-        my $cond = NET::Sieve::Script::Condition->new($param{test_list});
+        my $cond = ( ref($param{test_list}) eq 'NET::Sieve::Script::Condition' ) ? 
+            $param{test_list} :
+            NET::Sieve::Script::Condition->new($param{test_list});
         $self->conditions($cond);
     }
 
@@ -301,7 +303,9 @@ sub delete_action
 =head2 add_action
 
  Purpose   : add action at end of block
- Arguments : command line or NET::Sieve::Script::Action object
+ Arguments : command line  
+             or command line list with ; separator
+             or NET::Sieve::Script::Action object
  Return    : 1 on success
 
 =cut
@@ -311,11 +315,19 @@ sub add_action
     my $self = shift;
     my $action = shift;
 
-    my $pAction = (ref($action) eq 'NET::Sieve::Script::Action')?$action:NET::Sieve::Script::Action->new($action);
-
     my @Actions = defined $self->actions?@{$self->actions()}:();
 
-    push @Actions, $pAction;
+    if ($action =~m /;/g && ref($action) ne 'NET::Sieve::Script::Action' ) {
+        my @list_actions = split(';',$action);
+        foreach my $sub_action (@list_actions) {
+            push @Actions, NET::Sieve::Script::Action->new($sub_action);
+        }
+    } else {
+
+        my $pAction = (ref($action) eq 'NET::Sieve::Script::Action')?$action:NET::Sieve::Script::Action->new($action);
+
+        push @Actions, $pAction;
+    }
 
     $self->actions(\@Actions);
 
