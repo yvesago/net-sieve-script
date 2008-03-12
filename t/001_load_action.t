@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 10;
 use strict;
 
 use lib qw(lib);
@@ -21,6 +21,10 @@ is ( $action->param, '"bart@example.edu"', 'param bart@example.edu');
 
 $action = NET::Sieve::Script::Action->new('nimp "bart@example.edu"');
 is ( $action->command, undef, "undef for command nimp");
+
+$action = NET::Sieve::Script::Action->new('vacation "I am away this week.";');
+is ( $action->command, 'vacation' , "vacation command");
+is ( $action->param, '"I am away this week."' , "vacation param");
 
 my $multi_line_param = 'text: some text 
 on multi-line 

@@ -1,4 +1,4 @@
-use Test::More tests => 34;
+use Test::More tests => 35;
 use strict;
 
 use lib qw(lib);
@@ -90,7 +90,16 @@ if header :contains "Subject" "Re: Test2"
 
 is( _strip($script2->write_rules), _strip($res_oo), "good oo style write");
 
+my $script3 = NET::Sieve::Script->new();
+my $rule3 =  NET::Sieve::Script::Rule->new();
+$rule3->alternate('vacation');
+$actions = 'vacation "I\'m out -- send mail to cyrus-bugs"';
+$rule3->add_action($actions);
+$script3->add_rule($rule3);
+is ( _strip($script3->write_rules), _strip('require "vacation";
+    vacation "I\'m out -- send mail to cyrus-bugs";'), "write simple vacation");
+
 #print "======\n";
 #print $Rules[3]->write."\n";
 #print "======\n";
-#print $script2->write_rules;
+#print $script3->write_rules;

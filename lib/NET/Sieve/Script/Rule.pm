@@ -58,6 +58,11 @@ sub write
 {
     my $self = shift;
 
+    # for simple vacation RFC 5230
+    if ( $self->alternate eq 'vacation' ) {
+        return $self->write_action;
+    }
+
     return $self->alternate.' '.
             $self->write_condition."\n".
             '    {'.

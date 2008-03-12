@@ -14,6 +14,16 @@ sub new
 
     my ($command, $param) = $init =~ m/(keep|discard|redirect|stop|reject|fileinto)@MATCH?/sgi;
 
+    # RFC 5230
+ #Usage:   vacation [":days" number] [":subject" string]
+ #                    [":from" string] [":addresses" string-list]
+ #                    [":mime"] [":handle" string] <reason: string>
+ #TODO make object vacation
+    if ( $init =~ m/vacation (.*")/sgi ) {
+        $command = 'vacation';
+        $param = $1;
+    };
+
     $self->command(lc($command)) if $command;
     $self->param($param) if $param ;
 

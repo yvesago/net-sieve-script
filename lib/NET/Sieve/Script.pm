@@ -114,9 +114,14 @@ sub read_rules
 
     my @Rules;
 
+    # for simple vacation RFC 5230
+    if ($script_raw =~m/^(vacation .*)$/) {
+        push @Rules, NET::Sieve::Script::Rule->new(ctrl => 'vacation',block => $1,order =>1)
+    }
+
     my $order;
     while ($script_raw =~m/(if|else|elsif) (.*?){(.*?)}([\s;]?)/isg) {
-        my $ctrl = $1;
+        my $ctrl = lc($1);
         my $test_list = $2;
         my $block = $3;
 
@@ -294,7 +299,7 @@ sub _strip {
     $script_raw =~ s/\s+$//;
     $script_raw =~ s/","/", "/g;
 #TODO: to remove write_rules will set require
-    $script_raw =~ s/require.*?["\]];\s+//sgi if ($keep_require); #remove require
+    $script_raw =~ s/require.*?["\]];\s+//sgi if (!$keep_require); #remove require
 
 	return $script_raw;
 }
