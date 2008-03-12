@@ -1,6 +1,6 @@
 TODO list for Perl module NET::Sieve::Script
 
-- write doc
+* write doc
 - _trim method
 * _strip method
 * :over
@@ -12,5 +12,5 @@ TODO list for Perl module NET::Sieve::Script
 * add/del conditions : swap is useless, find can use AllConds
 - chg alternate on order
 * vrfy RFC for match/case order
-- more tests case
+* more tests case
 - manage comment rules

@@ -36,7 +36,7 @@ sub new
     $param =~ s/[\r\n]//gs;
 
     return undef if 
-        $param !~ m/^(not )?(address|enveloppe|header|size|allof|anyof|exists|false|true)(.*)/i;
+        $param !~ m/^(not )?(address|envelope|header|size|allof|anyof|exists|false|true)(.*)/i;
 
     my $not = lc($1);
     my $test = lc($2);
@@ -144,12 +144,7 @@ sub new
     return $self;
 }
 
-=head2 write
-
- Purpose  : write rule conditions
- Return   : multi-line formated text
-
-=cut
+# see head2 write
 
 sub write {
     my $self = shift;
@@ -227,22 +222,57 @@ NET::Sieve::Script::Condition - parse and write conditions in sieve scripts
 
   use NET::Sieve::Script::Condition;
 
+  my $cond = NET::Sieve::Script::Condition->new('header');
+    $cond->match_type(':contains');
+    $cond->key_list('"[Test4]"');
+    $cond->header_list('"Subject"');
+
+   print $cond->write();
+
+or
+
+   my $cond = NET::Sieve::Script::Condition->new(
+     'anyof (
+       header :contains "Subject" "[Test]",
+	   header :contains "Subject" "[Test2]")'
+	 );
+
+   print $cond->write();
+
 =head1 DESCRIPTION
 
-B<WARNING!!! This module is still in early alpha stage. It is recommended
-that you use it only for testing.>
+Parse and write condition part of Sieve rules, see L<NET::Sieve::Script>.
 
-http://www.ietf.org/rfc/rfc3028.txt
+Support RFC 5228, 5231 (relationnal) and regex draft
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
+Match and set accessors for each condition object in conditions tree, "test" is mandatory 
+
+Internal
+
+  id :        id for condition, set by creation order
+  condition : array of sub conditions 
+  parent :    parent of sub condition
+  AllConds :  array of pointers for all conditions
+
+Condition parts
+  not          : 'not' or nothing
+  test         : 'header', 'address', ...
+  key_list     : "subject" or ["To", "Cc"]
+  header_list  : "text" or ["text1", "text2"]
+  address_part : ':all ', ':localpart ', ...
+  match_type   : ':is ', ':contains ', ...
+  comparator   : string part
+
 =head1 METHODS
 
-=head1 BUGS
+=head2 write
 
-=head1 SUPPORT
+ Purpose  : write rule conditions in text format
+ Return   : multi-line formated text
 
 =head1 AUTHOR
 

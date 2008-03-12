@@ -2,7 +2,7 @@ package NET::Sieve::Script::Action;
 use strict;
 use base qw(Class::Accessor::Fast);
 
-__PACKAGE__->mk_accessors(qw(action command param));
+__PACKAGE__->mk_accessors(qw(command param));
 
 sub new
 {
@@ -37,31 +37,46 @@ NET::Sieve::Script::Action - parse and write actions in sieve scripts
 =head1 SYNOPSIS
 
   use NET::Sieve::Script::Action;
+  $action = NET::Sieve::Script::Action->new('redirect "bart@example.edu"');
+
+or
+
+  $action = NET::Sieve::Script::Action->new();
+  $action->command('redirect');
+  $action->param('"bart@example.edu"');
+
 
 =head1 DESCRIPTION
 
-B<WARNING!!! This module is still in early alpha stage. It is recommended
-that you use it only for testing.>
+Action object for L<NET::Sieve::Script>, with command and optional param.
 
-http://www.ietf.org/rfc/rfc3028.txt
-
-=head1 CONSTRUCTOR
-
-=head2 new
+Support RFC 5228, RFC 5230 (vacation), regex draft
 
 =head1 METHODS
 
-=head1 BUGS
+=head2 CONSTRUCTOR new
 
-=head1 SUPPORT
+ Argument : "command param" string, 
+
+parse valid commands from RFCs, param are not validate. 
+
+=head2 command
+
+read command : C<< $action->command() >>
+
+set command  : C<< $action->command('stop') >> 
+
+=head2 param
+
+read param : C<< $action->param() >>
+
+set param  : C<< $action->param(' :days 3 "I am away this week."') >>
 
 =head1 AUTHOR
 
-    Yves Agostini
-    CPAN ID: YVESAGO
-    Univ Metz
-    agostini@univ-metz.fr
-    http://www.crium.univ-metz.fr
+Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
+
+L<http://www.crium.univ-metz.fr>
 
 =head1 COPYRIGHT
 

@@ -4,6 +4,39 @@ use base qw(Class::Accessor::Fast);
 use  NET::Sieve::Script::Action;
 use NET::Sieve::Script::Condition;
 
+=head1 NAME
+
+NET::Sieve::Script::Rule - parse and write rules in sieve scripts
+
+=head1 SYNOPSIS
+
+  use NET::Sieve::Script::Rule;
+        my $pRule = NET::Sieve::Script::Rule->new (
+            ctrl => $ctrl,
+            test_list => $test_list,
+            block => $block,
+            order => $order
+            );
+
+or
+    my $rule =  NET::Sieve::Script::Rule->new();
+    my $cond = NET::Sieve::Script::Condition->new('header');
+       $cond->match_type(':contains');
+       $cond->header_list('"Subject"');
+       $cond->key_list('"Re: Test2"');
+    my $actions = 'fileinto "INBOX.test"; stop;';
+
+      $rule->add_condition($cond);
+      $rule->add_action($actions);
+
+      print $rule->write;
+
+=head1 DESCRIPTION
+
+
+
+=cut
+
 __PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
 
 =head1 CONSTRUCTOR
@@ -12,10 +45,20 @@ __PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
 
     Arguments :
         order =>     : optionnal set priority for rule
-        ctrl  =>     : optionnal default 'if', else could be 'else' or 'elsif'
+        ctrl  =>     : optionnal default 'if', else could be 'else', 'elsif' 
+                       or 'vacation'
         test_list => : optionnal conditions by string or by Condition Object
         block =>     : optionnal block of commands
     Returns   :   NET::Sieve::Script::Rule object
+
+Set accessors
+
+  alternate  : as param ctrl
+  conditions : first condition in tree
+  actions    : array of actions objects
+  priority   : rule order in script, main id for rule
+  require    :
+
 
 =cut
 
@@ -47,6 +90,8 @@ sub new
 
     return $self;
 }
+
+=head1 METHODS
 
 =head2 write
 
@@ -339,37 +384,6 @@ sub add_action
     return 1;
 }
 
-=head1 NAME
-
-NET::Sieve::Script::Rule - parse and write rules in sieve scripts
-
-=head1 SYNOPSIS
-
-  use NET::Sieve::Script::Rule;
-        my $pRule = NET::Sieve::Script::Rule->new (
-            ctrl => $ctrl,
-            test_list => $test_list,
-            block => $block,
-            order => $order
-            );
-
-
-=head1 DESCRIPTION
-
-B<WARNING!!! This module is still in early alpha stage. It is recommended
-that you use it only for testing.>
-
-http://www.ietf.org/rfc/rfc3028.txt
-
-=head1 CONSTRUCTOR
-
-=head2 new
-
-=head1 METHODS
-
-=head1 BUGS
-
-=head1 SUPPORT
 
 =head1 AUTHOR
 

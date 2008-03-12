@@ -15,26 +15,89 @@ BEGIN {
 use base qw(Class::Accessor::Fast);
 use NET::Sieve::Script::Rule;
 
-__PACKAGE__->mk_accessors(qw(raw rules require max_priority));
+=head1 NAME
 
-#################### subroutine header begin ####################
+NET::Sieve::Script - parse and write sieve scripts
 
-=head2 sample_function
+=head1 SYNOPSIS
 
- Usage     : How to use this function/method
- Purpose   : What it does
- Returns   : What it returns
- Argument  : What it wants to know
- Throws    : Exceptions and other anomolies
- Comment   : This is a sample subroutine header.
-           : It is polite to include more pod and fewer comments.
+  use NET::Sieve::Script;
+  
+  my $test_script = 'require "fileinto";
+     # Place all these in the "Test" folder
+     if header :contains "Subject" "[Test]" {
+	       fileinto "Test";
+     }';
+  
+  my $script = NET::Sieve::Script->new ($test_script);
+     
+     print "OK" if ( $script->parsing_ok ) ;
+     
+     print $script->write_script;
 
-See Also   : 
+or
+
+    my $script = NET::Sieve::Script->new();
+    
+    my $cond = NET::Sieve::Script::Condition->new('header');
+       $cond->match_type(':contains');
+       $cond->header_list('"Subject"');
+       $cond->key_list('"Re: Test2"');
+    
+    my $actions = 'fileinto "INBOX.test"; stop;';
+    
+    my $rule =  NET::Sieve::Script::Rule->new();
+       $rule->add_condition($cond);
+       $rule->add_action($actions);
+       
+       $script->add_rule($rule);
+       
+       print $script->write_script;
+
+
+
+=head1 DESCRIPTION
+
+Manage sieve script
+
+Read and parse file script, make L<NET::Sieve::Script::Rule>, L<NET::Sieve::Script::Action>, L<NET::Sieve::Script::Condition> objects
+
+Write sieve script
+
+Support RFC 5228 - sieve base
+    RFC 5231 - relationnal
+    RFC 5230 - vacation
+    Draft regex
+
+missing 
+    5229 variables
+    5232 imapflags
+    5233 subaddress
+    5235 spamtest
+    notify draft
 
 =cut
 
-#################### subroutine header end ####################
+__PACKAGE__->mk_accessors(qw(raw rules require max_priority));
 
+=cut
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    Argument : optional text script
+    Purpose  : if param, put script in raw, parse script
+    Return   : main Script object
+
+Accessors :
+
+    ->raw()          : read or set original text script
+    ->require()      : require part of script
+    ->rules()        : array of rules
+    ->max_priority() : last rule id 
+
+=cut
 
 sub new
 {
@@ -52,9 +115,11 @@ sub new
     return $self;
 }
 
+=head1 METHODS
+
 =head2 parsing_ok
 
-return 1 if parsing of raw is ok
+return 1 on raw parsing success
 
 =cut
 
@@ -67,9 +132,10 @@ sub parsing_ok
 
 =head2 write_script
 
- Purpose : write script, ie require and rules 
- Return  : set current require
- return rules ordered by priority in text format
+Purpose : write full script, require and rules parts
+
+Return  : set current require,
+         return rules ordered by priority in text format
 
 =cut
 
@@ -105,9 +171,11 @@ sub write_script {
 
 =head2 read_rules
 
-Read rules from raw or from $text_rules if set
-set ->rules()
-Return 1 on success;
+ $script->read_rules()  : read rules from raw 
+ $script->read_rules($some_text) : parse text rules
+ use of read_rules set $script->rules()
+
+Return 1 on success
 
 =cut
 
@@ -158,8 +226,9 @@ sub read_rules
 
 =head2 find_rule
 
-return NET::Sieve::Script::Rule pointer find by priority
-return 0 on error, 1 on not find
+Return L<NET::Sieve::Script::Rule> pointer find by priority
+
+Return 0 on error, 1 on not find
 
 =cut
 
@@ -179,7 +248,10 @@ sub find_rule
 
 =head2 swap_rules
 
-swap priority, don't take care of if/else/elsif
+Swap priorities, 
+ now don't take care of if/else/elsif
+
+Return 1 on success, 0 on error
 
 =cut
 
@@ -206,14 +278,13 @@ sub swap_rules
 
 =head2 delete_rule
 
- delete rule and change priority
- delete rule take care for 'if' test
+Delete rule and change priority, delete rule take care for 'if' test
 
  if deleted is 'if'
   delete next if next is 'else'
   change next in 'if' next is 'elsif'
 
- Returns : 1 on success, 0 on error
+Return : 1 on success, 0 on error
 
 =cut
 
@@ -256,9 +327,11 @@ sub delete_rule
 
 =head2 add_rule
 
- Purpose  : add a rule in end of script
- Returns  : priority on success, 0 on error
- Argument : NET::Sieve::Script::Rule object
+Purpose  : add a rule in end of script
+
+Return   : priority on success, 0 on error
+
+Argument : NET::Sieve::Script::Rule object
 
 =cut
 
@@ -282,10 +355,10 @@ sub add_rule
     return $order;
 }
 
-# private en exported tool _strip
+# private and exported tool _strip
 #  strip a string or strip raw
 #  return a string
-# usefull for parsing or test
+# usefull for parsing or tests
 #
 # default remove require line or set $keep_require
 
@@ -317,56 +390,21 @@ sub _strip {
 	return $script_raw;
 }
 
-#################### main pod documentation begin ###################
-## Below is the stub of documentation for your module. 
-## You better edit it!
-
-
-=head1 NAME
-
-NET::Sieve::Script - parse and write sieve scripts
-
-=head1 SYNOPSIS
-
-  use NET::Sieve::Script;
-  blah blah blah
-
-
-=head1 DESCRIPTION
-
-B<WARNING!!! This module is still in early alpha stage. It is recommended
-that you use it only for testing.>
-
-Support RFC 5228 - sieve base
-    RFC 5231 - relationnal
-    RFC 5230 - vacation
-    Draft regex
-
-missing 
-    5229 variables
-    5232 imapflags
-    5233 subadress
-    5235 spamtest
-    notify draft
-
-
-=head1 CONSTRUCTOR
-
-=head2 new
-
-=head1 METHODS
-
 =head1 BUGS
+
+Rewrite a hand made script will lose comments. Verify parsing success with parsing_ok method before write a new script.
 
 =head1 SUPPORT
 
+Please report any bugs or feature requests to "bug-net-sieve-script at rt.cpan.org", or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=NET-Sieve-Script>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+
 =head1 AUTHOR
 
-    Yves Agostini
-    CPAN ID: YVESAGO
-    Univ Metz
-    agostini@univ-metz.fr
-    http://www.crium.univ-metz.fr
+Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
+
+L<http://www.crium.univ-metz.fr>
 
 =head1 COPYRIGHT
 
@@ -382,9 +420,6 @@ LICENSE file included with this module.
 L<NET::Sieve>
 
 =cut
-
-#################### main pod documentation end ###################
-
 
 1;
 # The preceding line will help the module return a true value
