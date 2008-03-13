@@ -169,6 +169,7 @@ sub write_action
 =head2 delete_condition
 
  Purpose   : delete condition by rule, delete all block on delete anyof/allof
+             delete single anyof/allof block : single condition move up
  Arguments : condition id
  Returns   : 1 on success, 0 on error
 
