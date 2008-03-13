@@ -379,16 +379,17 @@ sub _strip {
 
     $script_raw =~ s/\#.*//g;      # hash-comment
     $script_raw =~ s!/\*.*.\*/!!g; # bracket-comment
-    $script_raw =~ s/\t/ /g;  # white-space
-    $script_raw =~ s/\s+/ /g; # white-space
-    $script_raw =~ s/\(\s+/\(/g; #  remove white-space after ( 
-    $script_raw =~ s/\s+\)/\)/g; # remove white-space before )
-    $script_raw =~ s/\[\s+/\[/g; #  remove white-space after [ 
-    $script_raw =~ s/\s+\]\s+/\]/g; # remove white-space before ]
-    $script_raw =~ s/^\s+//;
-    $script_raw =~ s/\s+$//;
-    $script_raw =~ s/","/", "/g;
-    $script_raw =~ s/"\s+;/";/g;
+    $script_raw =~ s/\t/ /g;  # remove tabs 
+    $script_raw =~ s/\(/ \( /g; #  add white-space around ( 
+    $script_raw =~ s/\)/ \) /g; #  add white-space around )
+    $script_raw =~ s/\s+\[/ \[ /g; # add white-space around [ 
+    $script_raw =~ s/\]\s+/ \] /g; # add white-space around ]
+    $script_raw =~ s/\]\s*,/\],/g; # add white-space around ]
+    $script_raw =~ s/"\s*,/", /g; # add white-space after , in list
+    $script_raw =~ s/"\s+;/";/g; # remove white-space between " and ;
+    $script_raw =~ s/\s+/ /g; # remove doubs white-space
+    $script_raw =~ s/^\s+//; # trim
+    $script_raw =~ s/\s+$//; #trim
 
     $script_raw =~ s/require.*?["\]];\s+//sgi if (!$keep_require); #remove require
 

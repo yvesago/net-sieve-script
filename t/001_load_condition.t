@@ -63,7 +63,7 @@ allof (
 
 foreach my $string (@strings) {
     my $cond = NET::Sieve::Script::Condition->new($string);
-    is (_strip($cond->write),_strip($string),'test string');
+    is (_strip($string),_strip($cond->write),'test string');
 };
 
 
