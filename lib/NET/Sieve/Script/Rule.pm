@@ -182,6 +182,8 @@ sub delete_condition
     my $cond_to_delete =  $self->conditions->AllConds->{$id};
     return 0 if (! defined $cond_to_delete);
 
+    delete $self->conditions->AllConds->{$id};
+
     if (! defined $cond_to_delete->parent) {
         $self->conditions(undef);
         return 1;
@@ -191,14 +193,24 @@ sub delete_condition
     foreach my $cond (@parent_conditions) {
         push @new_conditions, $cond if ( $cond->id != $id );
     }
-    $cond_to_delete->parent->condition(\@new_conditions);
 
+    # remove single block
+    if ( scalar @new_conditions == 1 ) {
+        my $last_cond = $new_conditions[0];
+        my $parent = $last_cond->parent;
+        my $old_parent = $parent->parent;
+        my $new_cond = NET::Sieve::Script::Condition->new($last_cond->write);
+           $self->delete_condition($parent->id);
+           $self->add_condition($new_cond,(defined $old_parent)?$old_parent->id:0);
+    }
+
+    $cond_to_delete->parent->condition(\@new_conditions);
     return 1;
 }
 
 =head2 add_condition
 
- Purpose   : add condition to rule, add 'anyof' group on second rule
+ Purpose   : add condition to rule, add 'allof' group on second rule
  Arguments : string or Condition object
  Returns   : new condition id or 0 on error
 
@@ -233,7 +245,7 @@ sub add_condition
         }
         else {
             # add a new block on second add
-            my $new_anyoff = NET::Sieve::Script::Condition->new('anyof');
+            my $new_anyoff = NET::Sieve::Script::Condition->new('allof');
             my @conditions_list = ();
             $cond->parent($new_anyoff);
             $self->conditions->parent($new_anyoff);
