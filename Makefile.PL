@@ -7,7 +7,7 @@ WriteMakefile(
     NAME         => 'NET::Sieve::Script',
     VERSION_FROM => 'lib/NET/Sieve/Script.pm', # finds \$VERSION
     AUTHOR       => 'Yves Agostini (agostini@univ-metz.fr)',
-    ABSTRACT     => 'Module abstract (<= 44 characters) goes here',
+    ABSTRACT     => 'Parse and write Sieve scripts',
     PREREQ_PM    => {
                      'Test::Simple' => 0.44,
                     },
