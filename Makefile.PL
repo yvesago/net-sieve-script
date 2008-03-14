@@ -10,5 +10,6 @@ WriteMakefile(
     ABSTRACT     => 'Parse and write Sieve scripts',
     PREREQ_PM    => {
                      'Test::Simple' => 0.44,
+                     'Class::Accessor::Fast' => 0.30,
                     },
 );
