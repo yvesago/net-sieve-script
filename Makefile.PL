@@ -9,9 +9,7 @@ WriteMakefile(
     AUTHOR       => 'Yves Agostini (agostini@univ-metz.fr)',
     ABSTRACT     => 'Parse and write Sieve scripts',
     PREREQ_PM    => {
-                     'Test::Simple' => 0.44,
 					 'Test::More' => 0.1,
                      'Class::Accessor::Fast' => 0.30,
-					 'Test::Pod::Coverage' => 1.04,
                     },
 );

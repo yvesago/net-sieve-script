@@ -1,4 +1,4 @@
-package NET::Sieve::Script::Action;
+package Net::Sieve::Script::Action;
 use strict;
 use base qw(Class::Accessor::Fast);
 
@@ -32,23 +32,23 @@ sub new
 
 =head1 NAME
 
-NET::Sieve::Script::Action - parse and write actions in sieve scripts
+Net::Sieve::Script::Action - parse and write actions in sieve scripts
 
 =head1 SYNOPSIS
 
-  use NET::Sieve::Script::Action;
-  $action = NET::Sieve::Script::Action->new('redirect "bart@example.edu"');
+  use Net::Sieve::Script::Action;
+  $action = Net::Sieve::Script::Action->new('redirect "bart@example.edu"');
 
 or
 
-  $action = NET::Sieve::Script::Action->new();
+  $action = Net::Sieve::Script::Action->new();
   $action->command('redirect');
   $action->param('"bart@example.edu"');
 
 
 =head1 DESCRIPTION
 
-Action object for L<NET::Sieve::Script>, with command and optional param.
+Action object for L<Net::Sieve::Script>, with command and optional param.
 
 Support RFC 5228, RFC 5230 (vacation), regex draft
 

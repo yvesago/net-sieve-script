@@ -1,4 +1,4 @@
-package NET::Sieve::Script::Condition;
+package Net::Sieve::Script::Condition;
 use strict;
 use base qw(Class::Accessor::Fast);
 
@@ -77,7 +77,7 @@ sub new
         my @condition_list;
         my @condition_list_string = split ( ',', $subs );
         foreach my $sub_condition (@condition_list_string) {
-            my $new_subs = NET::Sieve::Script::Condition->new($sub_condition);
+            my $new_subs = Net::Sieve::Script::Condition->new($sub_condition);
             next if (!$new_subs);
             if ( $new_subs->test eq 'anyof' || $new_subs->test eq 'allof' ) {
                 my $child_tab = pop @FILO;
@@ -221,13 +221,13 @@ sub _write_test {
 
 =head1 NAME
 
-NET::Sieve::Script::Condition - parse and write conditions in sieve scripts
+Net::Sieve::Script::Condition - parse and write conditions in sieve scripts
 
 =head1 SYNOPSIS
 
-  use NET::Sieve::Script::Condition;
+  use Net::Sieve::Script::Condition;
 
-  my $cond = NET::Sieve::Script::Condition->new('header');
+  my $cond = Net::Sieve::Script::Condition->new('header');
     $cond->match_type(':contains');
     $cond->key_list('"[Test4]"');
     $cond->header_list('"Subject"');
@@ -236,7 +236,7 @@ NET::Sieve::Script::Condition - parse and write conditions in sieve scripts
 
 or
 
-   my $cond = NET::Sieve::Script::Condition->new(
+   my $cond = Net::Sieve::Script::Condition->new(
      'anyof (
        header :contains "Subject" "[Test]",
 	   header :contains "Subject" "[Test2]")'
@@ -246,7 +246,7 @@ or
 
 =head1 DESCRIPTION
 
-Parse and write condition part of Sieve rules, see L<NET::Sieve::Script>.
+Parse and write condition part of Sieve rules, see L<Net::Sieve::Script>.
 
 Support RFC 5228, 5231 (relationnal) and regex draft
 

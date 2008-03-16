@@ -1,17 +1,17 @@
-package NET::Sieve::Script::Rule;
+package Net::Sieve::Script::Rule;
 use strict;
 use base qw(Class::Accessor::Fast);
-use  NET::Sieve::Script::Action;
-use NET::Sieve::Script::Condition;
+use  Net::Sieve::Script::Action;
+use Net::Sieve::Script::Condition;
 
 =head1 NAME
 
-NET::Sieve::Script::Rule - parse and write rules in sieve scripts
+Net::Sieve::Script::Rule - parse and write rules in sieve scripts
 
 =head1 SYNOPSIS
 
-  use NET::Sieve::Script::Rule;
-        my $pRule = NET::Sieve::Script::Rule->new (
+  use Net::Sieve::Script::Rule;
+        my $pRule = Net::Sieve::Script::Rule->new (
             ctrl => $ctrl,
             test_list => $test_list,
             block => $block,
@@ -19,8 +19,8 @@ NET::Sieve::Script::Rule - parse and write rules in sieve scripts
             );
 
 or
-    my $rule =  NET::Sieve::Script::Rule->new();
-    my $cond = NET::Sieve::Script::Condition->new('header');
+    my $rule =  Net::Sieve::Script::Rule->new();
+    my $cond = Net::Sieve::Script::Condition->new('header');
        $cond->match_type(':contains');
        $cond->header_list('"Subject"');
        $cond->key_list('"Re: Test2"');
@@ -49,7 +49,7 @@ __PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
                        or 'vacation'
         test_list => : optionnal conditions by string or by Condition Object
         block =>     : optionnal block of commands
-    Returns   :   NET::Sieve::Script::Rule object
+    Returns   :   Net::Sieve::Script::Rule object
 
 Set accessors
 
@@ -75,15 +75,15 @@ sub new
         my @Actions;
         my @commands = split( ';' , $param{block});
         foreach my $command (@commands) {
-            push @Actions, NET::Sieve::Script::Action->new($command);
+            push @Actions, Net::Sieve::Script::Action->new($command);
         };  
         $self->actions(\@Actions);
     }
 
     if ($param{test_list}) {
-        my $cond = ( ref($param{test_list}) eq 'NET::Sieve::Script::Condition' ) ? 
+        my $cond = ( ref($param{test_list}) eq 'Net::Sieve::Script::Condition' ) ? 
             $param{test_list} :
-            NET::Sieve::Script::Condition->new($param{test_list});
+            Net::Sieve::Script::Condition->new($param{test_list});
         $self->conditions($cond);
     }
 
@@ -200,7 +200,7 @@ sub delete_condition
         my $last_cond = $new_conditions[0];
         my $parent = $last_cond->parent;
         my $old_parent = $parent->parent;
-        my $new_cond = NET::Sieve::Script::Condition->new($last_cond->write);
+        my $new_cond = Net::Sieve::Script::Condition->new($last_cond->write);
            $self->delete_condition($parent->id);
            $self->add_condition($new_cond,(defined $old_parent)?$old_parent->id:0);
     }
@@ -222,7 +222,7 @@ sub add_condition
     my $self = shift;
     my $cond = shift;
     my $parent_id = shift;
-    $cond = ref($cond) eq 'NET::Sieve::Script::Condition' ? $cond : NET::Sieve::Script::Condition->new($cond);
+    $cond = ref($cond) eq 'Net::Sieve::Script::Condition' ? $cond : Net::Sieve::Script::Condition->new($cond);
 
     if ($parent_id) {
         # add new condition to anyof/allof parent block
@@ -246,7 +246,7 @@ sub add_condition
         }
         else {
             # add a new block on second add
-            my $new_anyoff = NET::Sieve::Script::Condition->new('allof');
+            my $new_anyoff = Net::Sieve::Script::Condition->new('allof');
             my @conditions_list = ();
             $cond->parent($new_anyoff);
             $self->conditions->parent($new_anyoff);
@@ -284,8 +284,8 @@ sub swap_actions
     my $pa1 = $self->find_action($swap1);
     my $pa2 = $self->find_action($swap2);
 
-    return 0 if ref($pa1) ne 'NET::Sieve::Script::Action';
-    return 0 if ref($pa2) ne 'NET::Sieve::Script::Action';
+    return 0 if ref($pa1) ne 'Net::Sieve::Script::Action';
+    return 0 if ref($pa2) ne 'Net::Sieve::Script::Action';
 
     my @Actions = @{$self->actions()};
     my @NewActions = ();
@@ -311,7 +311,7 @@ sub swap_actions
 =head2 find_action
 
  find action by order
- Returns:  NET::Sieve::Script::Action object, 0 on error
+ Returns:  Net::Sieve::Script::Action object, 0 on error
 
 =cut
 
@@ -368,7 +368,7 @@ sub delete_action
  Purpose   : add action at end of block
  Arguments : command line  
              or command line list with ; separator
-             or NET::Sieve::Script::Action object
+             or Net::Sieve::Script::Action object
  Return    : 1 on success
 
 =cut
@@ -380,14 +380,14 @@ sub add_action
 
     my @Actions = defined $self->actions?@{$self->actions()}:();
 
-    if ($action =~m /;/g && ref($action) ne 'NET::Sieve::Script::Action' ) {
+    if ($action =~m /;/g && ref($action) ne 'Net::Sieve::Script::Action' ) {
         my @list_actions = split(';',$action);
         foreach my $sub_action (@list_actions) {
-            push @Actions, NET::Sieve::Script::Action->new($sub_action);
+            push @Actions, Net::Sieve::Script::Action->new($sub_action);
         }
     } else {
 
-        my $pAction = (ref($action) eq 'NET::Sieve::Script::Action')?$action:NET::Sieve::Script::Action->new($action);
+        my $pAction = (ref($action) eq 'Net::Sieve::Script::Action')?$action:Net::Sieve::Script::Action->new($action);
 
         push @Actions, $pAction;
     }

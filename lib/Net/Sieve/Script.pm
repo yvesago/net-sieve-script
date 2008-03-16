@@ -1,10 +1,10 @@
-package NET::Sieve::Script;
+package Net::Sieve::Script;
 use strict;
 
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.02';
+    $VERSION     = '0.03';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -13,15 +13,15 @@ BEGIN {
 }
 
 use base qw(Class::Accessor::Fast);
-use NET::Sieve::Script::Rule;
+use Net::Sieve::Script::Rule;
 
 =head1 NAME
 
-NET::Sieve::Script - parse and write sieve scripts
+Net::Sieve::Script - parse and write sieve scripts
 
 =head1 SYNOPSIS
 
-  use NET::Sieve::Script;
+  use Net::Sieve::Script;
   
   my $test_script = 'require "fileinto";
      # Place all these in the "Test" folder
@@ -29,7 +29,7 @@ NET::Sieve::Script - parse and write sieve scripts
 	       fileinto "Test";
      }';
   
-  my $script = NET::Sieve::Script->new ($test_script);
+  my $script = Net::Sieve::Script->new ($test_script);
      
      print "OK" if ( $script->parsing_ok ) ;
      
@@ -37,16 +37,16 @@ NET::Sieve::Script - parse and write sieve scripts
 
 or
 
-    my $script = NET::Sieve::Script->new();
+    my $script = Net::Sieve::Script->new();
     
-    my $cond = NET::Sieve::Script::Condition->new('header');
+    my $cond = Net::Sieve::Script::Condition->new('header');
        $cond->match_type(':contains');
        $cond->header_list('"Subject"');
        $cond->key_list('"Re: Test2"');
     
     my $actions = 'fileinto "INBOX.test"; stop;';
     
-    my $rule =  NET::Sieve::Script::Rule->new();
+    my $rule =  Net::Sieve::Script::Rule->new();
        $rule->add_condition($cond);
        $rule->add_action($actions);
        
@@ -60,7 +60,7 @@ or
 
 Manage sieve script
 
-Read and parse file script, make L<NET::Sieve::Script::Rule>, L<NET::Sieve::Script::Action>, L<NET::Sieve::Script::Condition> objects
+Read and parse file script, make L<Net::Sieve::Script::Rule>, L<Net::Sieve::Script::Action>, L<Net::Sieve::Script::Condition> objects
 
 Write sieve script
 
@@ -197,7 +197,7 @@ sub read_rules
 
     # for simple vacation RFC 5230
     if ($script_raw =~m/^(vacation .*)$/) {
-        push @Rules, NET::Sieve::Script::Rule->new(ctrl => 'vacation',block => $1,order =>1)
+        push @Rules, Net::Sieve::Script::Rule->new(ctrl => 'vacation',block => $1,order =>1)
     }
 
     my $order;
@@ -212,7 +212,7 @@ sub read_rules
         die "50 rules does not sound reasonable !" 
              if  ( $order >= 50 );
 
-        my $pRule = NET::Sieve::Script::Rule->new (
+        my $pRule = Net::Sieve::Script::Rule->new (
             ctrl => $ctrl,
             test_list => $test_list,
             block => $block,
@@ -230,7 +230,7 @@ sub read_rules
 
 =head2 find_rule
 
-Return L<NET::Sieve::Script::Rule> pointer find by priority
+Return L<Net::Sieve::Script::Rule> pointer find by priority
 
 Return 0 on error, 1 on not find
 
@@ -270,8 +270,8 @@ sub swap_rules
     my $pr1 = $self->find_rule($swap1);
     my $pr2 = $self->find_rule($swap2);
     
-    return 0 if ref($pr1) ne 'NET::Sieve::Script::Rule';
-    return 0 if ref($pr2) ne 'NET::Sieve::Script::Rule';
+    return 0 if ref($pr1) ne 'Net::Sieve::Script::Rule';
+    return 0 if ref($pr2) ne 'Net::Sieve::Script::Rule';
 
     my $mem_pr2 = $pr2->priority();
     $pr2->priority($pr1->priority());
@@ -335,7 +335,7 @@ Purpose  : add a rule in end of script
 
 Return   : priority on success, 0 on error
 
-Argument : NET::Sieve::Script::Rule object
+Argument : Net::Sieve::Script::Rule object
 
 =cut
 
@@ -344,7 +344,7 @@ sub add_rule
     my $self = shift;
     my $rule = shift;
 
-    return 0 if ref($rule) ne 'NET::Sieve::Script::Rule';
+    return 0 if ref($rule) ne 'Net::Sieve::Script::Rule';
 
     my $order = $self->max_priority();
     my @Rules =  defined $self->rules?@{$self->rules}:();
@@ -369,7 +369,7 @@ sub add_rule
 sub _strip {
     my ( $self, $script_raw, $keep_require ) = @_;
 
-    if ( ref($self) eq 'NET::Sieve::Script' ) {
+    if ( ref($self) eq 'Net::Sieve::Script' ) {
         $script_raw = $self->raw() if (! $script_raw );
     } else {
         $script_raw = $self;
@@ -400,7 +400,7 @@ Rewrite a hand made script will lose comments. Verify parsing success with parsi
 
 =head1 SUPPORT
 
-Please report any bugs or feature requests to "bug-net-sieve-script at rt.cpan.org", or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=NET-Sieve-Script>.
+Please report any bugs or feature requests to "bug-net-sieve-script at rt.cpan.org", or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Sieve-Script>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
@@ -421,7 +421,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-L<NET::Sieve>
+L<Net::Sieve>
 
 =cut
 
