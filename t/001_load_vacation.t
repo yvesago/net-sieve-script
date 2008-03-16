@@ -4,11 +4,11 @@ use strict;
 use lib qw(lib);
 
 BEGIN {
-    use_ok( 'NET::Sieve::Script');
-    use_ok( 'NET::Sieve::Script::Rule' );
+    use_ok( 'Net::Sieve::Script');
+    use_ok( 'Net::Sieve::Script::Rule' );
 }
 
-my $script = NET::Sieve::Script->new();
+my $script = Net::Sieve::Script->new();
 
 $script->raw('require "vacation";
    vacation :days 23 :addresses ["tjs@example.edu",

@@ -3,12 +3,12 @@ use strict;
 
 use lib qw(lib);
 
-BEGIN { use_ok( 'NET::Sieve::Script::Rule' ); }
+BEGIN { use_ok( 'Net::Sieve::Script::Rule' ); }
 
 my $command = ' fileinto "INBOX.spam" ';
 
 # test case on keywords
-my $rule = NET::Sieve::Script::Rule->new(
+my $rule = Net::Sieve::Script::Rule->new(
     ctrl => 'iF',
     block => 'Fileinto "spam"; 
     stop;',

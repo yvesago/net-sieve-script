@@ -4,12 +4,14 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    NAME         => 'NET::Sieve::Script',
-    VERSION_FROM => 'lib/NET/Sieve/Script.pm', # finds \$VERSION
+    NAME         => 'Net::Sieve::Script',
+    VERSION_FROM => 'lib/Net/Sieve/Script.pm', # finds \$VERSION
     AUTHOR       => 'Yves Agostini (agostini@univ-metz.fr)',
     ABSTRACT     => 'Parse and write Sieve scripts',
     PREREQ_PM    => {
                      'Test::Simple' => 0.44,
+					 'Test::More' => 0.1,
                      'Class::Accessor::Fast' => 0.30,
+					 'Test::Pod::Coverage' => 1.04,
                     },
 );

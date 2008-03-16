@@ -80,8 +80,6 @@ missing
 
 __PACKAGE__->mk_accessors(qw(raw rules require max_priority));
 
-=cut
-
 =head1 CONSTRUCTOR
 
 =head2 new

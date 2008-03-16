@@ -4,16 +4,16 @@ use strict;
 use lib qw(lib);
 
 BEGIN {
-    use_ok( 'NET::Sieve::Script');
-    use_ok( 'NET::Sieve::Script::Rule' ); 
+    use_ok( 'Net::Sieve::Script');
+    use_ok( 'Net::Sieve::Script::Rule' ); 
 }
 
-my $script = NET::Sieve::Script->new();
+my $script = Net::Sieve::Script->new();
 
 # register 3 rules
 my @Rules = ();
 for my $i (1..3) {
-    $Rules[$i] = NET::Sieve::Script::Rule->new(
+    $Rules[$i] = Net::Sieve::Script::Rule->new(
         test_list => 'header :contains "Subject" "[Test'.$i.']"' ,
         block => 'fileinto "Test'.$i.'"; stop;'
         );
@@ -21,7 +21,7 @@ for my $i (1..3) {
 }
 
 #print $script->write_script;
-isa_ok($script->find_rule(2),'NET::Sieve::Script::Rule');
+isa_ok($script->find_rule(2),'Net::Sieve::Script::Rule');
 
 ok ($script->swap_rules(3,2),"swap rules 3,2");
 is ($script->swap_rules(4,2),0,"test error on swap rules");
@@ -42,7 +42,7 @@ for my $i (1..6) {
     my $ctrl = 'if' ;
    $ctrl = 'else' if $i == 5;
    $ctrl = 'elsif' if ( $i == 3 || $i == 4 );
-    $Rules[$i] = NET::Sieve::Script::Rule->new(
+    $Rules[$i] = Net::Sieve::Script::Rule->new(
         ctrl => $ctrl,
         block => 'fileinto "Test'.$i.'"; stop;',
         test_list => ($i != 5)?'header :contains "Subject" "[Test'.$i.']"' :''
@@ -57,7 +57,7 @@ ok ($script->delete_rule(2),"delete rule 2 and 3, rule 'if' with 'else' ");
 is ($script->max_priority,2,"2 rules");
 
 # add else rule
-my $else_rule = NET::Sieve::Script::Rule->new(
+my $else_rule = Net::Sieve::Script::Rule->new(
     ctrl => 'else',
     block => 'reject; stop;'
     );
@@ -68,9 +68,9 @@ ok ($script->delete_rule(1),"delete rule 1 and 2, rule 'if' with 'else' ");
 is ($script->max_priority,0,"no more rule");
 
 
-my $script2 = NET::Sieve::Script->new();
-my $rule2 =  NET::Sieve::Script::Rule->new();
-my $cond = NET::Sieve::Script::Condition->new('header');
+my $script2 = Net::Sieve::Script->new();
+my $rule2 =  Net::Sieve::Script::Rule->new();
+my $cond = Net::Sieve::Script::Condition->new('header');
 $cond->match_type(':contains');
 $cond->header_list('"Subject"');
 $cond->key_list('"Re: Test2"');
@@ -90,8 +90,8 @@ if header :contains "Subject" "Re: Test2"
 
 is( _strip($script2->write_script), _strip($res_oo), "good oo style write");
 
-my $script3 = NET::Sieve::Script->new();
-my $rule3 =  NET::Sieve::Script::Rule->new();
+my $script3 = Net::Sieve::Script->new();
+my $rule3 =  Net::Sieve::Script::Rule->new();
 $rule3->alternate('vacation');
 $actions = 'vacation "I\'m out -- send mail to cyrus-bugs"';
 $rule3->add_action($actions);

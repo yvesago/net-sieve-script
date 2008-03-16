@@ -7,12 +7,12 @@ use strict;
 
 use lib qw(lib);
 
-use NET::Sieve::Script;
+use Net::Sieve::Script;
 
-BEGIN { use_ok( 'NET::Sieve::Script::Condition' ); }
+BEGIN { use_ok( 'Net::Sieve::Script::Condition' ); }
 
 my $bad_string = 'header :contains :comparator "i;octet" "i;octet" "Subject" "MAKE MONEY FAST"';
-isnt (NET::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string not RFC 5228');
+isnt (Net::Sieve::Script::Condition->new($bad_string)->write,$bad_string,'bad string not RFC 5228');
 
 my @strings = (
 'header :value "ge" :comparator "i;ascii-numeric" ["X-Spam-score"] ["14"]',
@@ -62,7 +62,7 @@ allof (
 
 
 foreach my $string (@strings) {
-    my $cond = NET::Sieve::Script::Condition->new($string);
+    my $cond = Net::Sieve::Script::Condition->new($string);
     is (_strip($string),_strip($cond->write),'test string');
 };
 
@@ -79,7 +79,7 @@ my $s1 = 'allof (
 
 my $test = $s1;
 #print $test."\n=====\n";
-#my $cond = NET::Sieve::Script::Condition->new($test);
+#my $cond = Net::Sieve::Script::Condition->new($test);
 #use Data::Dumper;
 #print Dumper $cond;
 #print $cond->write;

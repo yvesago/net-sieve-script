@@ -4,11 +4,11 @@ use strict;
 use lib qw(lib);
 
 BEGIN {
-    use_ok( 'NET::Sieve::Script::Rule' );
-    use_ok( 'NET::Sieve::Script::Condition');
+    use_ok( 'Net::Sieve::Script::Rule' );
+    use_ok( 'Net::Sieve::Script::Condition');
 }
 
-my $rule = NET::Sieve::Script::Rule->new(
+my $rule = Net::Sieve::Script::Rule->new(
 #   test_list => 'anyof (header :contains "Subject" "[Test]",header :contains "Subject" "[Test2]")' ,
     );
 
@@ -21,7 +21,7 @@ ok ( $rule->delete_condition(1), "delete condition 1") ;
 
 ok ( $rule->add_condition('anyof (header :contains "Subject" "[Test2]",header :contains "Subject" "[Test3]")'), "add complex condition by string");
 
-my $cond = NET::Sieve::Script::Condition->new('header');
+my $cond = Net::Sieve::Script::Condition->new('header');
 $cond->match_type(':contains');
 $cond->key_list('"[Test4]"');
 $cond->header_list('"Subject"');

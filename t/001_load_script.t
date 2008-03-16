@@ -7,7 +7,7 @@ use strict;
 
 use lib qw(lib);
 
-BEGIN { use_ok( 'NET::Sieve::Script' ); }
+BEGIN { use_ok( 'Net::Sieve::Script' ); }
 
 my $test_script='require "fileinto";
 # Place all these in the "Test" folder
@@ -15,15 +15,15 @@ if header :contains "Subject" "[Test]" {
        fileinto "Test";
 }';
 
-my $object = NET::Sieve::Script->new ();
-isa_ok ($object, 'NET::Sieve::Script');
+my $object = Net::Sieve::Script->new ();
+isa_ok ($object, 'Net::Sieve::Script');
 
-use_ok( 'NET::Sieve::Script::Rule' );
-use_ok( 'NET::Sieve::Script::Condition' );
-use_ok( 'NET::Sieve::Script::Action' );
+use_ok( 'Net::Sieve::Script::Rule' );
+use_ok( 'Net::Sieve::Script::Condition' );
+use_ok( 'Net::Sieve::Script::Action' );
 
-my $object = NET::Sieve::Script->new ($test_script);
-isa_ok ($object, 'NET::Sieve::Script');
+my $object = Net::Sieve::Script->new ($test_script);
+isa_ok ($object, 'Net::Sieve::Script');
 
 is ($object->raw, $test_script, "set in raw for simple script");
 #print length($object->raw);

@@ -264,7 +264,7 @@ sub add_condition
     return $cond->id;
 }
 
-=head2 swap_action
+=head2 swap_actions
 
  swap actions by order
  return 1 on succes, 0 on failure

@@ -1,4 +1,7 @@
-Revision history for Perl module NET::Sieve::Script
+Revision history for Perl module Net::Sieve::Script
+
+0.03 Sun, 16 Mar 2008 08:52:34 +0100
+   - old NET name was wrong, rename to Net
 
 0.02 Wed Mar 12 09:41:13 2008
     - missing dep for CPAN tester
