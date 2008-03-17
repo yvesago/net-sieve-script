@@ -14,3 +14,4 @@ TODO list for Perl module Net::Sieve::Script
 * vrfy RFC for match/case order
 * more tests case
 - manage comment rules
+- add rules_changeorder method
