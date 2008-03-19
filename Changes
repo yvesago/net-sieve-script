@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Sieve::Script
 
+0.04 Wed, 19 Mar 2008 15:07:12 +0100
+   - less strip on [], to preserv key header
+
 0.03 Sun, 16 Mar 2008 08:52:34 +0100
    - old NET name was wrong, rename to Net
 

@@ -11,7 +11,7 @@ BEGIN { use_ok( 'Net::Sieve::Script' ); }
 
 my $test_script='require "fileinto";
 # Place all these in the "Test" folder
-if header :contains "Subject" "[Test]" {
+if header :contains "Subject" "[Test] test" {
        fileinto "Test";
 }';
 
