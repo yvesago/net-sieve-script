@@ -1,4 +1,15 @@
 Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/Net/Sieve/Script.pm
 lib/Net/Sieve/Script/Action.pm
 lib/Net/Sieve/Script/Condition.pm
@@ -6,6 +17,7 @@ lib/Net/Sieve/Script/Rule.pm
 LICENSE
 Makefile.PL
 MANIFEST
+META.yml
 README
 t/001_load.t
 t/001_load_action.t

@@ -1,6 +1,12 @@
 package Net::Sieve::Script::Action;
 use strict;
+#use warnings;
+
 use base qw(Class::Accessor::Fast);
+
+use vars qw($VERSION);
+
+$VERSION = '0.0.5';
 
 __PACKAGE__->mk_accessors(qw(command param));
 

@@ -1,15 +1,18 @@
+use inc::Module::Install;
 
+name            'Net-Sieve-Script';
+perl_version    '5.006';
+all_from        'lib/Net/Sieve/Script.pm';
+version_from    'lib/Net/Sieve/Script.pm';
 
-use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-    NAME         => 'Net::Sieve::Script',
-    VERSION_FROM => 'lib/Net/Sieve/Script.pm', # finds \$VERSION
-    AUTHOR       => 'Yves Agostini (agostini@univ-metz.fr)',
-    ABSTRACT     => 'Parse and write Sieve scripts',
-    PREREQ_PM    => {
-					 'Test::More' => 0.1,
-                     'Class::Accessor::Fast' => 0.30,
-                    },
-);
+requires 'Class::Accessor::Fast' => 0.30;
+
+build_requires  'Pod::Coverage';
+build_requires  'Test::More';
+
+auto_install;
+
+tests('t/*.t');
+
+WriteAll;
+

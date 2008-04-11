@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Sieve::Script
 
+0.0.5 Fri, 11 Apr 2008 11:31:45 +0200
+   - use Module::Install instead of ModuleMaker
+   - add version for all files
+
 0.04 Wed, 19 Mar 2008 15:07:12 +0100
    - less strip on [], to preserv key header
 

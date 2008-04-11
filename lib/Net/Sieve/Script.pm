@@ -1,10 +1,11 @@
 package Net::Sieve::Script;
 use strict;
+#use warnings;
 
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.04';
+    $VERSION     = '0.05';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -17,7 +18,7 @@ use Net::Sieve::Script::Rule;
 
 =head1 NAME
 
-Net::Sieve::Script - parse and write sieve scripts
+Net::Sieve::Script - Parse and write sieve scripts
 
 =head1 SYNOPSIS
 
