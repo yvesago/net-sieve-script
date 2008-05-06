@@ -1,11 +1,11 @@
 package Net::Sieve::Script::Rule;
 use strict;
-#use warnings;
+use warnings;
 use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.0.5';
+$VERSION = '0.06';
 
 use  Net::Sieve::Script::Action;
 use Net::Sieve::Script::Condition;
@@ -114,10 +114,13 @@ sub write
         return $self->write_action;
     }
 
-    return $self->alternate.' '.
-            $self->write_condition."\n".
+    my $write_condition = ($self->write_condition)?$self->write_condition:'';
+	my $write_action = ($self->write_action)?$self->write_action:'';
+
+	return $self->alternate.' '.
+            $write_condition."\n".
             '    {'.
-            "\n".$self->write_action.
+            "\n".$write_action.
             '    } ';
 }
 
@@ -154,7 +157,7 @@ sub write_action
 {
     my $self = shift;
 
-    my $actions;
+    my $actions = '';
     my $require = $self->require();
 
     foreach my $command ( @{$self->actions()} ) {

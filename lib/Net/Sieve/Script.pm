@@ -1,11 +1,11 @@
 package Net::Sieve::Script;
 use strict;
-#use warnings;
+use warnings;
 
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.05';
+    $VERSION     = '0.06';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -113,7 +113,7 @@ sub new
 
     # break if more than 50 rules
     die "50 rules does not sound reasonable !" 
-            if  ( $self->max_priority() >= 50 );
+            if  (  $self->max_priority() && $self->max_priority() >= 50 );
 
     return $self;
 }
@@ -150,7 +150,7 @@ sub write_script {
     foreach my $rule ( sort { $a->priority() <=> $b->priority() } @{$self->rules()} ) {
       $text .= $rule->write."\n";
 	  foreach my $req ($rule->require()) {
-	      $require{$req->[0]} = 1;
+	      $require{$req->[0]} = 1 if defined $req->[0];
 	  }
     }
 
@@ -412,6 +412,8 @@ Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
 L<http://www.crium.univ-metz.fr>
 
 =head1 COPYRIGHT
+
+Copyright 2008 Yves Agostini - <agostini@univ-metz.fr>
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

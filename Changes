@@ -1,6 +1,10 @@
 Revision history for Perl module Net::Sieve::Script
 
-0.0.5 Fri, 11 Apr 2008 11:31:45 +0200
+0.06 Tue, 6 May 2008 20:20:04 +0200
+   - add copyright
+   - add use warnings, fix uninitialized values
+
+0.05 Fri, 11 Apr 2008 11:31:45 +0200
    - use Module::Install instead of ModuleMaker
    - add version for all files
 

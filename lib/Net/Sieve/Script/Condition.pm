@@ -1,12 +1,12 @@
 package Net::Sieve::Script::Condition;
 use strict;
-#use warnings;
+use warnings;
 
 use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.0.5';
+$VERSION = '0.06';
 
 __PACKAGE__->mk_accessors(qw(test not id condition parent AllConds key_list header_list address_part match_type comparator require));
 
@@ -192,7 +192,7 @@ sub _write_test {
     my $self = shift;
     my $line = $self->not.' '.$self->test.' ';
    
-   my $comparator = ':comparator '.$self->comparator if ($self->comparator);
+   my $comparator = ($self->comparator)?':comparator '.$self->comparator : '';
    
     if ( $self->test eq 'address' ) {
         $line .= $self->address_part.' '.$comparator.' '.$self->match_type;
@@ -213,7 +213,10 @@ sub _write_test {
 	};
 	
 
-    $line.=' '.$self->header_list.' '.$self->key_list;
+    my $header_list = ($self->header_list)?$self->header_list:'';
+	my $key_list = ($self->key_list)?$self->key_list:'';
+
+    $line.=' '.$header_list.' '.$key_list;
 
     $line =~ s/^\s+//;
     $line =~ s/\s+$//;
