@@ -5,7 +5,7 @@ use warnings;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.06';
+    $VERSION     = '0.07';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -23,36 +23,36 @@ Net::Sieve::Script - Parse and write sieve scripts
 =head1 SYNOPSIS
 
   use Net::Sieve::Script;
-  
+
   my $test_script = 'require "fileinto";
      # Place all these in the "Test" folder
      if header :contains "Subject" "[Test]" {
 	       fileinto "Test";
      }';
-  
+
   my $script = Net::Sieve::Script->new ($test_script);
-     
+
      print "OK" if ( $script->parsing_ok ) ;
-     
+
      print $script->write_script;
 
 or
 
     my $script = Net::Sieve::Script->new();
-    
+
     my $cond = Net::Sieve::Script::Condition->new('header');
        $cond->match_type(':contains');
        $cond->header_list('"Subject"');
        $cond->key_list('"Re: Test2"');
-    
+
     my $actions = 'fileinto "INBOX.test"; stop;';
-    
+
     my $rule =  Net::Sieve::Script::Rule->new();
        $rule->add_condition($cond);
        $rule->add_action($actions);
-       
+
        $script->add_rule($rule);
-       
+
        print $script->write_script;
 
 
@@ -277,6 +277,45 @@ sub swap_rules
     my $mem_pr2 = $pr2->priority();
     $pr2->priority($pr1->priority());
     $pr1->priority($mem_pr2);
+
+    return 1;
+}
+
+=head2 reorder_rules
+
+Reorder rules with a list of number, start with 1, and with blanck separator. Usefull for ajax sort functions.
+
+Thank you jeanne for your help in brain storming.
+
+Return 1 on success, 0 on error
+
+=cut
+
+sub reorder_rules
+{
+    my $self = shift;
+    my $list = shift;
+
+	return 0 if ( ! $list );
+
+    my @swap = split ' ',$list;
+
+	return 0 if ( ! scalar @swap );
+	return 0 if ( scalar @swap != $self->max_priority );
+
+    my @new_ordered_rules;
+    foreach my $swap ( @swap ) {
+      if ($swap =~ m/\d+/) {
+       my $rule = $self->find_rule($swap);
+       push @new_ordered_rules, $rule;
+      }
+    }
+
+    my $i=1;
+    foreach my $rule (@new_ordered_rules) {
+      $rule->priority($i);
+      $i++;
+    };
 
     return 1;
 }

@@ -1,4 +1,4 @@
-use Test::More tests => 35;
+use Test::More tests => 46;
 use strict;
 
 use lib qw(lib);
@@ -21,6 +21,7 @@ for my $i (1..3) {
 }
 
 #print $script->write_script;
+#exit;
 isa_ok($script->find_rule(2),'Net::Sieve::Script::Rule');
 
 ok ($script->swap_rules(3,2),"swap rules 3,2");
@@ -103,3 +104,26 @@ is ( _strip($script3->write_script), _strip('require "vacation";
 #print $Rules[3]->write."\n";
 #print "======\n";
 #print $script3->write_script;
+for my $i (1..4) {
+    $Rules[$i] = Net::Sieve::Script::Rule->new(
+        test_list => 'header :contains "Subject" "[Test'.$i.']"' ,
+        block => 'fileinto "Test'.$i.'"'
+        );
+    ok ($script->add_rule($Rules[$i]), "add rule $i");
+};
+
+#print $script->write_script;
+
+my $reorder_list="1 4 2 3";
+ok( $script->reorder_rules($reorder_list), "success on reorder_rules");
+
+my $new_rule = $script->find_rule(2);
+is ($new_rule->write_condition,'header :contains "Subject" "[Test4]"','Rule 4 on priority 2');
+
+ $new_rule = $script->find_rule(3);
+is ($new_rule->write_condition,'header :contains "Subject" "[Test2]"','Rule 2 on priority 3');
+
+is ($script->reorder_rules(), 0, "missing reorder list");
+is ($script->reorder_rules("1,2,3"), 0, "wrong list");
+is ($script->reorder_rules("1 2 3"), 0, "missing list element");
+is ($script->reorder_rules("6 5 1 2 3"), 0, "too much list element");

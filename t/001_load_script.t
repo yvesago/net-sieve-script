@@ -22,7 +22,7 @@ use_ok( 'Net::Sieve::Script::Rule' );
 use_ok( 'Net::Sieve::Script::Condition' );
 use_ok( 'Net::Sieve::Script::Action' );
 
-my $object = Net::Sieve::Script->new ($test_script);
+$object = Net::Sieve::Script->new ($test_script);
 isa_ok ($object, 'Net::Sieve::Script');
 
 is ($object->raw, $test_script, "set in raw for simple script");
