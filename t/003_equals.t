@@ -2,7 +2,7 @@
 
 # t/003_equals.t - test equals methods
 
-use Test::More tests => 15;
+use Test::More tests => 16;
 use strict;
 
 use lib qw(lib);
@@ -131,6 +131,9 @@ is($test_object->equals($object),0,"test_object6 not equals object");
 
 $test_object = Net::Sieve::Script->new ($test_script7);
 ok($test_object->equals($test_object),'complex object is equal to itself');
+
+my $test_object2 = Net::Sieve::Script->new ($test_script7);
+ok($test_object->equals($test_object2),'complex object 2 is equal to complex object 1'); 
 
 #open F, "t/loud.txt";
 #my @test_loud = <F>;
