@@ -6,7 +6,7 @@ use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.06';
+$VERSION = '0.08';
 
 __PACKAGE__->mk_accessors(qw(test not id condition parent AllConds key_list header_list address_part match_type comparator require));
 
@@ -138,6 +138,10 @@ sub new
     if ( $test eq 'size'  ) {
       ($match,$string) = $args =~ m/@MATCH_SIZE(.*)$/gi;
 	};
+	# RFC Syntax : exists <header-names: string-list>
+	if ( $test eq 'exists' ) {
+	  ($string) = $args =~ m/@LISTS$/gi; 
+	}
     # find require
     if (lc($match) eq ':regex ') {
 	  push @{$require}, 'regex';
@@ -153,6 +157,63 @@ sub new
 
 
     return $self;
+}
+
+# see head2 equals
+
+sub equals {
+	my $self = shift;
+	my $object = shift;
+
+	return 0 unless (defined $object);
+	return 0 unless ($object->isa('Net::Sieve::Script::Condition'));
+
+	# Should we test "id" ? Probably not it's internal to the
+	# representaion of this object, and not a part of what actually makes
+	# it a sieve "condition"
+
+	my @accessors = qw( test not address_part match_type comparator require key_list header_list address_part );
+
+	foreach my $accessor ( @accessors ) {
+		my $myvalue = $self->$accessor;
+		my $theirvalue = $object->$accessor;
+		if (defined $myvalue) {
+			return 0 unless (defined $theirvalue); 
+            if ($accessor ne 'key_list') {
+                $theirvalue=~tr/[A-Z]/[a-z]/; 
+                $myvalue=~tr/[A-Z]/[a-z]/;
+            };
+			return 0 unless ($myvalue eq $theirvalue);
+		} else {
+			return 0 if (defined $theirvalue);
+		}
+	}
+
+	if (defined $self->condition) {
+		my $tmp = $self->condition;
+		my @myconds = @$tmp;
+		$tmp = $object->condition;
+		my @theirconds = @$tmp;
+		return 0 unless ($#myconds == $#theirconds);
+
+		unless ($#myconds == -1) {
+			foreach my $index (0..$#myconds) {
+				my $mycond = $myconds[$index];
+				my $theircond = $theirconds[$index];
+				if (defined ($mycond)) {
+					return 0 unless ($mycond->isa(
+									'Net::Sieve::Script::Condition'));
+					return 0 unless ($mycond->equals($theircond));
+				} else {
+					return 0 if (defined ($theircond));
+				}
+			}
+		}
+
+	} else {
+		return 0 if (defined ($object->condition));
+	}
+	return 1;
 }
 
 # see head2 write
@@ -274,7 +335,7 @@ Internal
 
 Condition parts
   not          : 'not' or nothing
-  test         : 'header', 'address', ...
+  test         : 'header', 'address', 'exists', ...
   key_list     : "subject" or ["To", "Cc"]
   header_list  : "text" or ["text1", "text2"]
   address_part : ':all ', ':localpart ', ...
@@ -282,6 +343,11 @@ Condition parts
   comparator   : string part
 
 =head1 METHODS
+
+=head2 equals
+
+ Purpose  : test conditions
+ Return   : 1 on equals conditions
 
 =head2 write
 

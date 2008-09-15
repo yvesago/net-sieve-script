@@ -1,4 +1,4 @@
-use Test::More tests => 46;
+use Test::More tests => 47;
 use strict;
 
 use lib qw(lib);
@@ -127,3 +127,16 @@ is ($script->reorder_rules(), 0, "missing reorder list");
 is ($script->reorder_rules("1,2,3"), 0, "wrong list");
 is ($script->reorder_rules("1 2 3"), 0, "missing list element");
 is ($script->reorder_rules("6 5 1 2 3"), 0, "too much list element");
+
+$script = Net::Sieve::Script->new();
+$new_rule = Net::Sieve::Script::Rule->new(
+    test_list => 'not exists ["From","Date"]',
+    block => 'fileinto "Test"'
+    );
+$script->add_rule($new_rule);
+$res_oo='require "fileinto";
+if not exists ["From", "Date"]
+    {
+    fileinto "Test";
+    }';
+is( _strip($script->write_script),_strip($res_oo),'write exists condition');

@@ -5,7 +5,7 @@ use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.06';
+$VERSION = '0.08';
 
 use  Net::Sieve::Script::Action;
 use Net::Sieve::Script::Condition;
@@ -98,6 +98,73 @@ sub new
 }
 
 =head1 METHODS
+
+=head2 equals
+
+return 1 if rules are equals
+
+=cut
+
+sub equals {
+    my $self = shift;
+    my $object = shift;
+
+    return 0 unless (defined $object);
+    return 0 unless ($object->isa('Net::Sieve::Script::Rule'));
+
+    # Should we test "id" ? Probably not it's internal to the
+    # representaion of this object, and not a part of what actually makes
+    # it a sieve "condition"
+
+    #my @accessors = qw( alternate require );
+    my @accessors = qw( alternate );
+
+    foreach my $accessor ( @accessors ) {
+        my $myvalue = $self->$accessor;
+        my $theirvalue = $object->$accessor;
+        if (defined $myvalue) {
+            return 0 unless (defined $theirvalue); 
+            return 0 unless ($myvalue eq $theirvalue);
+        } else {
+            return 0 if (defined $theirvalue);
+        }       
+    }
+
+	if ( defined $self->conditions ) {
+		return 0 unless ($self->conditions->isa(
+							'Net::Sieve::Script::Condition'));
+		return 0 unless ($self->conditions->equals($object->conditions));
+	} else {
+		return 0 if (defined $object->conditions ) ;
+	}
+
+	if (defined $self->actions) {
+		my $tmp = $self->actions;
+		my @myactions = @$tmp;
+		$tmp = $object->actions;
+		my @theiractions = @$tmp;
+		return 0 unless ($#myactions == $#theiractions);
+
+		unless ($#myactions == -1) {
+			foreach my $index (0..$#myactions) {
+				my $myaction = $myactions[$index];
+				my $theiraction = $theiractions[$index];
+				if (defined ($myaction)) {
+					 return 0 unless ($myaction->isa(
+					 		'Net::Sieve::Script::Action'));
+					return 0 unless ($myaction->equals($theiraction));
+				} else {
+					return 0 if (defined ($theiraction));
+				}       
+			}       
+		}       
+
+	} else {
+		return 0 if (defined ($object->actions));
+	}
+
+	return 1;
+}
 
 =head2 write
 

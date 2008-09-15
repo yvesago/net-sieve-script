@@ -51,6 +51,9 @@ if Header :is "Subject" "Daily virus scan reminder"
 {
   discard;
   stop;
+}
+if not exists ["From","Date"] {
+  discard;
 }';
 
 my $test_script3 = '

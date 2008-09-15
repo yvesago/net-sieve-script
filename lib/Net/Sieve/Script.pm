@@ -5,7 +5,7 @@ use warnings;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.07';
+    $VERSION     = '0.08';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -171,6 +171,58 @@ sub write_script {
 
     return $require_line.$text;
 }
+
+=head2 equals
+
+ $object->equals($test_object): return 1 if $object and $test_object are equals
+
+=cut
+
+sub equals {
+    my $self = shift;
+    my $object = shift;
+
+    return 0 unless (defined $object);
+    return 0 unless ($object->isa('Net::Sieve::Script'));
+
+    my @accessors = qw( require );
+
+    foreach my $accessor ( @accessors ) {
+        my $myvalue = $self->$accessor;
+        my $theirvalue = $object->$accessor;
+        if (defined $myvalue) {
+            return 0 unless (defined $theirvalue); 
+            return 0 unless ($myvalue eq $theirvalue);
+        } else {
+            return 0 if (defined $theirvalue);
+        }
+    }
+
+    if (defined $self->rules) {
+        my @myrules = sort { $a->priority() <=> $b->priority() } @{$self->rules()};
+        my @theirrules = sort { $a->priority() <=> $b->priority() } @{$object->rules()} ;
+        return 0 unless ($#myrules == $#theirrules);
+
+        unless ($#myrules == -1) {
+            foreach my $index (0..$#myrules) {
+                my $myrule = $myrules[$index];
+                my $theirrule = $theirrules[$index];
+                if (defined ($myrule)) {
+					return 0 unless ($myrule->isa(
+									'Net::Sieve::Script::Rule'));
+                    return 0 unless ($myrule->equals($theirrule));
+                } else {
+                    return 0 if (defined ($theirrule));
+                }
+            }
+        }
+
+    } else {
+        return 0 if (defined ($object->rules));
+    }
+	return 1;
+}
+
 
 =head2 read_rules
 

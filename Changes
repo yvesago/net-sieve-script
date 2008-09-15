@@ -1,5 +1,12 @@
 Revision history for Perl module Net::Sieve::Script
 
+0.08 Mon, 15 Sep 2008 12:48:29 +0200
+   - equals methods on Script, Action, Condition, Rule
+   - test exists
+   thanks to Mark Chappell patch on cpan RT, close RFI 39246
+   - add tests and pod for equals methods
+   - add tests for exists
+
 0.07 Thu, 08 May 2008 09:41:35 +0200
    - pod clean up
    - add script->reorder_rules method and tests

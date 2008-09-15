@@ -6,7 +6,7 @@ use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.06';
+$VERSION = '0.08';
 
 __PACKAGE__->mk_accessors(qw(command param));
 
@@ -35,6 +35,29 @@ sub new
 
     return $self;
 }
+
+sub equals {
+    my $self = shift;
+    my $object = shift;
+
+    return 0 unless (defined $object);
+    return 0 unless ($object->isa('Net::Sieve::Script::Action'));
+
+    my @accessors = qw( param command );
+
+    foreach my $accessor ( @accessors ) {
+        my $myvalue = $self->$accessor;
+        my $theirvalue = $object->$accessor;
+        if (defined $myvalue) {
+            return 0 unless (defined $theirvalue); 
+            return 0 unless ($myvalue eq $theirvalue);
+        } else {
+            return 0 if (defined $theirvalue);
+        }       
+    }
+	return 1;
+}
+
 
 =head1 NAME
 
@@ -77,6 +100,10 @@ set command  : C<< $action->command('stop') >>
 read param : C<< $action->param() >>
 
 set param  : C<< $action->param(' :days 3 "I am away this week."') >>
+
+=head2 equals
+
+return 1 if actions are equals
 
 =head1 AUTHOR
 
