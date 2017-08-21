@@ -5,7 +5,7 @@ use base qw(Class::Accessor::Fast);
 
 use vars qw($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 use  Net::Sieve::Script::Action;
 use Net::Sieve::Script::Condition;
@@ -478,9 +478,7 @@ sub add_action
 
     Yves Agostini
     CPAN ID: YVESAGO
-    Univ Metz
-    agostini@univ-metz.fr
-    http://www.crium.univ-metz.fr
+    yvesago@cpan.org
 
 =head1 COPYRIGHT
 

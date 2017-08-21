@@ -5,7 +5,7 @@ use warnings;
 BEGIN {
     use Exporter ();
     use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-    $VERSION     = '0.08';
+    $VERSION     = '0.09';
     @ISA         = qw(Exporter);
     #Give a hoot don't pollute, do not export more than needed by default
     @EXPORT      = qw(_strip);
@@ -498,13 +498,12 @@ I will be notified, and then you'll automatically be notified of progress on you
 
 =head1 AUTHOR
 
-Yves Agostini - Univ Metz - <agostini@univ-metz.fr>
+Yves Agostini - <yvesago@cpan.org>
 
-L<http://www.crium.univ-metz.fr>
 
 =head1 COPYRIGHT
 
-Copyright 2008 Yves Agostini - <agostini@univ-metz.fr>
+Copyright 2017 Yves Agostini - <yvesago@cpan.org>
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.
