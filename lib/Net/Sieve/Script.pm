@@ -335,7 +335,7 @@ sub swap_rules
 
 =head2 reorder_rules
 
-Reorder rules with a list of number, start with 1, and with blanck separator. Usefull for ajax sort functions.
+Reorder rules with a list of number, start with 1, and with blanck separator. Useful for ajax sort functions.
 
 Thank you jeanne for your help in brain storming.
 

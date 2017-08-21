@@ -50,11 +50,11 @@ __PACKAGE__->mk_accessors(qw(alternate conditions actions priority require));
 =head2 new
 
     Arguments :
-        order =>     : optionnal set priority for rule
-        ctrl  =>     : optionnal default 'if', else could be 'else', 'elsif' 
+        order =>     : optional set priority for rule
+        ctrl  =>     : optional default 'if', else could be 'else', 'elsif'
                        or 'vacation'
-        test_list => : optionnal conditions by string or by Condition Object
-        block =>     : optionnal block of commands
+        test_list => : optional conditions by string or by Condition Object
+        block =>     : optional block of commands
     Returns   :   Net::Sieve::Script::Rule object
 
 Set accessors

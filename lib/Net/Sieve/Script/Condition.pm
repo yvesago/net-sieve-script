@@ -352,7 +352,7 @@ Condition parts
 =head2 write
 
  Purpose  : write rule conditions in text format
- Return   : multi-line formated text
+ Return   : multi-line formatted text
 
 =head1 AUTHOR
 
