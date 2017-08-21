@@ -254,7 +254,7 @@ sub read_rules
     }
 
     my $order;
-    while ($script_raw =~m/(if|else|elsif) (.*?){(.*?)}([\s;]?)/isg) {
+    while ($script_raw =~m/(if|else|elsif) (.*?)\{(.*?)}([\s;]?)/isg) {
         my $ctrl = lc($1);
         my $test_list = $2;
         my $block = $3;
